@@ -217,7 +217,24 @@ main{padding:18px 0 80px}
 .tabs button{flex:1;padding:9px;border-radius:9px;font-size:.83rem;font-weight:650;color:var(--fg2)}
 .tabs button.on{background:var(--bg2);color:var(--fg);box-shadow:var(--sh)}
 
-.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--bg2);font-size:.8rem;font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--bg2);font-size:.8rem;font-weight:600;flex:none}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#1b1405}
+.chip .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+
+/* ---- mapa Eixample (prova pilot) ---- */
+.eixline-v{stroke:var(--fg3);stroke-width:2.4;cursor:pointer}
+.eixline-v:hover{stroke:var(--acc2)}
+.eixline-v.hi{stroke:var(--acc);stroke-width:5}
+.eixline-h{stroke:var(--line2);stroke-width:2.4;cursor:pointer}
+.eixline-h:hover{stroke:var(--acc2)}
+.eixline-h.hi{stroke:var(--acc);stroke-width:5}
+.eixlabel-v{fill:var(--fg2);font-size:10px;text-anchor:end}
+.eixlabel-v.hi{fill:var(--acc);font-weight:700}
+.eixlabel-h{fill:var(--fg2);font-size:10px}
+.eixlabel-h.hi{fill:var(--acc);font-weight:700}
+.eixdiag{stroke:var(--acc2);stroke-width:1.4;stroke-dasharray:6 4;opacity:.5}
+.eixpoi{stroke:var(--bg2);stroke-width:1.5;cursor:pointer}
+.eixpoi-ring{fill:none;stroke-width:2;opacity:.5}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
 
 .fade{animation:fade .28s ease}

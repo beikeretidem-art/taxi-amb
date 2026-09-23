@@ -4,3 +4,4 @@ __pycache__/
 node_modules/
 test/out.txt
 test/err.txt
+lab/

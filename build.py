@@ -14,6 +14,7 @@ def read(p):
 
 css = read('src/styles.css')
 app = read('src/app.js')
+eixmap = read('src/eixample_map.js')
 files = ['src/data/_head.js'] + sorted(os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, 'src', 'data', 'd*.js')))
 data = '\n'.join(read(f) for f in files)
 n = len(re.findall(r"^q\(", data, re.M))
@@ -43,7 +44,7 @@ BODY = """<div class="top" id="top"></div>
 <div class="toast" id="toast"></div>"""
 
 INNER = ('<script>window.APP_ICON=' + json.dumps(SVG_URI) + ';</script>\n<style>\n' + css + '\n</style>\n' + BODY +
-         '\n<script>\n' + data + '\n</script>\n<script>\n' + app + '\n</script>\n')
+         '\n<script>\n' + data + '\n</script>\n<script>\n' + eixmap + '\n</script>\n<script>\n' + app + '\n</script>\n')
 
 def page(links):
     return f"""<!DOCTYPE html>

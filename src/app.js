@@ -251,7 +251,44 @@ var T = {
   best:{ca:'El teu punt fort',es:'Tu punto fuerte'},
   new:{ca:'noves',es:'nuevas'},
   due:{ca:'per repassar',es:'para repasar'},
-  progressNote:{ca:'El progrés puja quan encertes una pregunta diverses vegades separades en el temps.',es:'El progreso sube cuando aciertas una pregunta varias veces separadas en el tiempo.'}
+  progressNote:{ca:'El progrés puja quan encertes una pregunta diverses vegades separades en el temps.',es:'El progreso sube cuando aciertas una pregunta varias veces separadas en el tiempo.'},
+  beta:{ca:'Prova pilot',es:'Prueba piloto'},
+  eixMap:{ca:'Mapa de l’Eixample',es:'Mapa del Eixample'},
+  eixMapD:{ca:'Aprèn els carrers amb un mapa interactiu',es:'Aprende las calles con un mapa interactivo'},
+  eixExplore:{ca:'Explorar',es:'Explorar'},
+  eixLesson:{ca:'Lliçó',es:'Lección'},
+  eixTest:{ca:'Test',es:'Test'},
+  eixNames:{ca:'Noms',es:'Nombres'},
+  eixDiag:{ca:'Diagonals',es:'Diagonales'},
+  eixPoi:{ca:'Punts d’interès',es:'Puntos de interés'},
+  eixBarris:{ca:'Barris',es:'Barrios'},
+  eixBarrisTitle:{ca:'Barris de l’Eixample',es:'Barrios del Eixample'},
+  eixFrom:{ca:'De',es:'De'},
+  eixTo:{ca:'a',es:'a'},
+  eixSide:{ca:'Costat',es:'Lado'},
+  eixSideBoth:{ca:'travessa tot l’Eixample',es:'atraviesa todo el Eixample'},
+  eixNear:{ca:'Punts d’interès a prop',es:'Puntos de interés cerca'},
+  eixLessonIntro:{ca:'Aprèn els carrers verticals en blocs, d’oest (Sants) a est (Poblenou).',es:'Aprende las calles verticales en bloques, de oeste (Sants) a este (Poblenou).'},
+  eixBlock:{ca:'Bloc',es:'Bloque'},
+  eixOf:{ca:'de',es:'de'},
+  eixGotIt:{ca:'Ho tinc — següent bloc',es:'Ya me lo sé — siguiente bloque'},
+  eixLessonDone:{ca:'Última tanda revelada. Passa al Test per comprovar què recordes.',es:'Última tanda revelada. Pasa al Test para comprobar qué recuerdas.'},
+  eixRestart:{ca:'Reiniciar lliçó',es:'Reiniciar lección'},
+  eixQ:{ca:'Quin carrer és el ressaltat?',es:'¿Qué calle es la resaltada?'},
+  eixStreak:{ca:'Ratxa',es:'Racha'},
+  eixAsked:{ca:'Preguntes',es:'Preguntas'},
+  catMonument:{ca:'Monuments',es:'Monumentos'},
+  catMuseu:{ca:'Museus',es:'Museos'},
+  catHospital:{ca:'Hospitals',es:'Hospitales'},
+  catHotel:{ca:'Hotels',es:'Hoteles'},
+  catTeatre:{ca:'Teatres',es:'Teatros'},
+  catCinema:{ca:'Cinemes',es:'Cines'},
+  catCultura:{ca:'Cultura',es:'Cultura'},
+  catComerc:{ca:'Comerç',es:'Comercio'},
+  catEdifici:{ca:'Edificis',es:'Edificios'},
+  catParc:{ca:'Parcs',es:'Parques'},
+  catTransport:{ca:'Transport',es:'Transporte'},
+  catMercat:{ca:'Mercats',es:'Mercados'}
 };
 function t(k,r){var s=(T[k]&&T[k][S.lang])||k; if(r){for(var p in r){s=s.split(p).join(r[p]);}} return s;}
 function L(o){ return o? (o[S.lang]||o.ca||o.es||'') : ''; }
@@ -282,7 +319,7 @@ function snapSession(){
 }
 function snapView(){
   var n=VIEW.name;
-  S.view = (n==='cats'||n==='stats'||n==='errors'||n==='cat') ? {name:n,arg:VIEW.arg} : null;
+  S.view = (n==='cats'||n==='stats'||n==='errors'||n==='cat'||n==='eixmap') ? {name:n,arg:VIEW.arg} : null;
 }
 function save(){
   try{ snapSession(); snapView(); }catch(e){}
@@ -480,6 +517,7 @@ function render(){
   else if(v==='levelIntro') viewIntro('level');
   else if(v==='mockIntro') viewIntro('mock');
   else if(v==='errors') viewErrors();
+  else if(v==='eixmap') viewEixMap();
   else viewHome();
 }
 
@@ -564,6 +602,7 @@ function viewHome(){
     tile('go-terr',IC.map,t('terr'),t('terrD'))+
     tile('go-cats',IC.grid,t('categories'),t('catsD'))+
     tile('go-all',IC.flip,t('allRandom'),t('allRandomD'))+
+    tile('go-eixmap',IC.map,t('eixMap')+' · '+t('beta'),t('eixMapD'))+
   '</div>';
 
   /* modules */
@@ -593,6 +632,7 @@ function viewHome(){
   document.getElementById('go-cats').onclick=function(){ go('cats'); };
   document.getElementById('go-all').onclick=function(){ startSession({mode:'all',pool:DB,n:Math.max(S.len,20),title:t('allRandom')}); };
   document.getElementById('go-stats').onclick=function(){ go('stats'); };
+  document.getElementById('go-eixmap').onclick=function(){ go('eixmap'); };
   app.querySelectorAll('[data-mod]').forEach(function(el){
     el.onclick=function(){ go('cat',el.dataset.mod); };
   });
@@ -1128,6 +1168,239 @@ function viewStats(){
   app.querySelectorAll('[data-sub]').forEach(function(el){
     el.onclick=function(){ var s=el.dataset.sub; startSession({mode:'sub',pool:BYSUB[s]||[],n:S.len,title:L(SUBS[s])}); };
   });
+}
+
+/* ---------------- MAPA EIXAMPLE (prova pilot) ---------------- */
+var EIXVIEW = { mode:'explore', quizStreak:0, quizTotal:0, activeCats:null };
+var EIX_CAT_COLOR = { monument:'#e8a020', museu:'#3b82c4', hospital:'#d64550', hotel:'#9b6fd1',
+  teatre:'#2f9e6e', cinema:'#2f9e6e', cultura:'#3b82c4', comerc:'#c99a1f', edifici:'#8b94a3',
+  parc:'#4c9a4c', transport:'#2f80c0', mercat:'#c99a1f' };
+function eixCatLabel(c){ return t('cat'+c.charAt(0).toUpperCase()+c.slice(1)); }
+function eixDetail(html){
+  var sh=document.getElementById('sheet');
+  sh.querySelector('.panel').innerHTML='<div class="grip"></div>'+html+
+    '<button class="btn ghost" id="eix-close" style="margin-top:14px">'+esc(t('ok'))+'</button>';
+  sh.classList.add('on');
+  document.getElementById('eix-close').onclick=closeSheet;
+}
+function viewEixMap(){
+  var D=window.EIXAMPLE, POIS=window.EIXAMPLE_POIS;
+  if(!D || !POIS){ go('home'); return; }
+  var verticals=D.verticals.slice().sort(function(a,b){return a.order-b.order;});
+  var horizontals=D.horizontals.slice().sort(function(a,b){return a.order-b.order;});
+  if(!EIXVIEW.activeCats){
+    EIXVIEW.activeCats={};
+    POIS.forEach(function(p){ EIXVIEW.activeCats[p.cat]=true; });
+  }
+
+  var html='<div class="wrap stack fade">'+
+    '<div><h1 style="margin-bottom:2px">'+esc(t('eixMap'))+'</h1>'+
+    '<p class="tiny muted">'+esc(t('beta'))+' · '+esc(t('eixMapD'))+'</p></div>'+
+    '<div class="tabs"><button data-eixmode="explore" class="'+(EIXVIEW.mode==='explore'?'on':'')+'">'+esc(t('eixExplore'))+'</button>'+
+    '<button data-eixmode="lesson" class="'+(EIXVIEW.mode==='lesson'?'on':'')+'">'+esc(t('eixLesson'))+'</button>'+
+    '<button data-eixmode="quiz" class="'+(EIXVIEW.mode==='quiz'?'on':'')+'">'+esc(t('eixTest'))+'</button></div>'+
+    '<div id="eix-body"></div>'+
+  '</div>';
+  app.innerHTML=html;
+  app.querySelectorAll('[data-eixmode]').forEach(function(b){
+    b.onclick=function(){ EIXVIEW.mode=b.dataset.eixmode; viewEixMap(); };
+  });
+
+  var body=document.getElementById('eix-body');
+  if(EIXVIEW.mode==='lesson'){ eixRenderLesson(body, verticals); return; }
+  if(EIXVIEW.mode==='quiz'){ eixRenderQuiz(body, verticals); return; }
+  eixRenderExplore(body, D, verticals, horizontals, POIS);
+}
+function eixBuildSvg(verticals, horizontals, D){
+  var W=verticals.length, colW=36, padL=92, padR=26;
+  var rowH=34, padT=32, padB=26;
+  var gridW=padL+(W-1)*colW+padR, gridH=padT+(horizontals.length-1)*rowH+padB;
+  function vx(order){ var i=verticals.findIndex(function(v){return v.order===order;}); return padL+i*colW; }
+  var ns='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(ns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  var svg=el('svg',{width:gridW,height:gridH,viewBox:'0 0 '+gridW+' '+gridH});
+  var hLines={}, hLabels={};
+  horizontals.forEach(function(hh,i){
+    var y=padT+i*rowH;
+    var x0=hh.side==='dreta'? vx(17):padL;
+    var x1=hh.side==='esquerra'? vx(16):(padL+(W-1)*colW);
+    var line=el('line',{x1:x0,y1:y,x2:x1,y2:y,class:'eixline-h','data-id':hh.id});
+    svg.appendChild(line); hLines[hh.id]=line;
+    var lbl=el('text',{x:x1+6,y:y+3,class:'eixlabel-h','data-id':hh.id});
+    lbl.textContent=hh.name; svg.appendChild(lbl); hLabels[hh.id]=lbl;
+  });
+  var vLines={}, vLabels={};
+  verticals.forEach(function(v,i){
+    var x=padL+i*colW;
+    var line=el('line',{x1:x,y1:padT,x2:x,y2:padT+(horizontals.length-1)*rowH,class:'eixline-v','data-id':v.id});
+    svg.appendChild(line); vLines[v.id]=line;
+    var lbl=el('text',{x:x+4,y:padT-9,class:'eixlabel-v',transform:'rotate(-55 '+(x+4)+' '+(padT-9)+')','data-id':v.id});
+    lbl.textContent=v.name; svg.appendChild(lbl); vLabels[v.id]=lbl;
+  });
+  var diagSpecs=[0.06,0.16,0.30,0.50,0.68,0.20,0.62,0.80,0.90];
+  var diagGroup=el('g',{'class':'eix-diaggroup'});
+  D.diagonals.forEach(function(dg,i){
+    var f=diagSpecs[i]!==undefined? diagSpecs[i]:(i/D.diagonals.length);
+    var xTop=padL+f*(W-1)*colW;
+    diagGroup.appendChild(el('line',{x1:xTop-36,y1:padT-2,x2:xTop+36,y2:padT+(horizontals.length-1)*rowH+2,class:'eixdiag'}));
+  });
+  svg.appendChild(diagGroup);
+  return {svg:svg, vx:vx, vLines:vLines, vLabels:vLabels, hLines:hLines, hLabels:hLabels, diagGroup:diagGroup, gridW:gridW, gridH:gridH, rowH:rowH, padT:padT, horizontals:horizontals};
+}
+function eixRenderExplore(body, D, verticals, horizontals, POIS){
+  var built=eixBuildSvg(verticals, horizontals, D);
+  var svg=built.svg;
+  var poiGroup=document.createElementNS('http://www.w3.org/2000/svg','g');
+  var poiCountByCol={};
+  POIS.forEach(function(p){
+    var v=verticals.find(function(vv){return vv.id===p.near;});
+    if(!v) return;
+    var x=built.vx(v.order);
+    var slot=poiCountByCol[v.id]||0; poiCountByCol[v.id]=slot+1;
+    var y=built.padT+24+(slot%(built.horizontals.length-2))*(built.rowH*0.92)+(Math.floor(slot/(built.horizontals.length-2))*10);
+    var ring=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ring.setAttribute('cx',x); ring.setAttribute('cy',y); ring.setAttribute('r',9);
+    ring.setAttribute('class','eixpoi-ring'); ring.setAttribute('stroke',EIX_CAT_COLOR[p.cat]||'#888'); ring.setAttribute('data-cat',p.cat);
+    var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',6);
+    c.setAttribute('class','eixpoi'); c.setAttribute('fill',EIX_CAT_COLOR[p.cat]||'#888'); c.setAttribute('data-cat',p.cat);
+    c.addEventListener('click',function(e){ e.stopPropagation(); eixDetail('<b style="display:block;margin-bottom:6px;font-size:1rem">'+esc(p.name)+'</b>'+
+      '<div class="tiny muted">'+esc(p.addr)+'</div><span class="pill" style="margin-top:8px;background:'+(EIX_CAT_COLOR[p.cat]||'#888')+';color:#1b1405;font-weight:700">'+esc(eixCatLabel(p.cat))+'</span>'); });
+    poiGroup.appendChild(ring); poiGroup.appendChild(c);
+  });
+  svg.appendChild(poiGroup);
+
+  function clearHi(){
+    Object.values(built.vLines).forEach(function(l){l.classList.remove('hi');});
+    Object.values(built.vLabels).forEach(function(l){l.classList.remove('hi');});
+    Object.values(built.hLines).forEach(function(l){l.classList.remove('hi');});
+    Object.values(built.hLabels).forEach(function(l){l.classList.remove('hi');});
+  }
+  verticals.forEach(function(v){
+    built.vLines[v.id].addEventListener('click',function(){
+      clearHi(); built.vLines[v.id].classList.add('hi'); built.vLabels[v.id].classList.add('hi');
+      var pois=POIS.filter(function(p){return p.near===v.id;});
+      eixDetail('<b style="display:block;margin-bottom:6px;font-size:1rem">'+esc(v.name)+'</b>'+
+        (v.from? '<div>'+esc(t('eixFrom'))+' <b>'+esc(v.from)+'</b> '+esc(t('eixTo'))+' <b>'+esc(v.to||'?')+'</b></div>':'')+
+        (v.sentit? '<span class="pill neutral" style="margin-top:6px">'+esc(v.sentit)+'</span>':'')+
+        (v.notes? v.notes.map(function(n){return '<div class="tiny muted" style="margin-top:6px">· '+esc(n)+'</div>';}).join(''):'')+
+        (pois.length? '<div class="tiny muted" style="margin-top:10px"><b style="color:var(--fg)">'+esc(t('eixNear'))+'</b><br>'+esc(pois.map(function(p){return p.name;}).join(', '))+'</div>':''));
+    });
+  });
+  horizontals.forEach(function(hh){
+    built.hLines[hh.id].addEventListener('click',function(){
+      clearHi(); built.hLines[hh.id].classList.add('hi'); built.hLabels[hh.id].classList.add('hi');
+      eixDetail('<b style="display:block;margin-bottom:6px;font-size:1rem">'+esc(hh.name)+'</b>'+
+        '<span class="pill neutral">'+esc(t('eixSide'))+': '+(hh.side==='both'? esc(t('eixSideBoth')):esc(hh.side))+'</span>'+
+        (hh.notes? hh.notes.map(function(n){return '<div class="tiny muted" style="margin-top:6px">· '+esc(n)+'</div>';}).join(''):''));
+    });
+  });
+
+  var catBar='';
+  Object.keys(EIX_CAT_COLOR).forEach(function(c){
+    if(!POIS.some(function(p){return p.cat===c;})) return;
+    var on=EIXVIEW.activeCats[c];
+    catBar+='<button class="chip'+(on?' on':'')+'" data-cat="'+c+'" style="'+(on?'background:'+EIX_CAT_COLOR[c]+';border-color:'+EIX_CAT_COLOR[c]+';color:#1b1405':'')+'">'+
+      '<span class="dot" style="background:'+EIX_CAT_COLOR[c]+'"></span>'+esc(eixCatLabel(c))+'</button>';
+  });
+
+  body.innerHTML=
+    '<div class="row" style="gap:8px;overflow-x:auto;padding:2px 2px 8px;flex-wrap:nowrap">'+
+      '<button class="chip on" data-toggle="names">'+esc(t('eixNames'))+'</button>'+
+      '<button class="chip on" data-toggle="diag">'+esc(t('eixDiag'))+'</button>'+
+      '<button class="chip on" data-toggle="poi">'+esc(t('eixPoi'))+'</button>'+
+      '<button class="chip" id="eix-barris">'+esc(t('eixBarris'))+'</button>'+
+    '</div>'+
+    '<div class="row" id="eix-catbar" style="gap:8px;overflow-x:auto;padding:0 2px 10px;flex-wrap:nowrap">'+catBar+'</div>'+
+    '<div class="card" id="eix-stage" style="overflow:auto;height:60vh;padding:10px"></div>';
+  document.getElementById('eix-stage').appendChild(svg);
+
+  document.getElementById('eix-barris').onclick=function(){
+    eixDetail('<b style="display:block;margin-bottom:8px;font-size:1rem">'+esc(t('eixBarrisTitle'))+'</b>'+
+      D.barris.map(function(b){return '<span class="pill neutral" style="margin:3px 4px 0 0">'+esc(b)+'</span>';}).join(''));
+  };
+  body.querySelectorAll('[data-toggle]').forEach(function(chip){
+    chip.onclick=function(){
+      var key=chip.dataset.toggle, on=!chip.classList.contains('on');
+      chip.classList.toggle('on',on);
+      if(key==='names'){ Object.values(built.vLabels).concat(Object.values(built.hLabels)).forEach(function(l){ l.style.display=on?'':'none'; }); }
+      else if(key==='diag'){ built.diagGroup.style.display=on?'':'none'; }
+      else if(key==='poi'){ poiGroup.style.display=on?'':'none'; document.getElementById('eix-catbar').style.display=on?'flex':'none'; }
+    };
+  });
+  body.querySelectorAll('#eix-catbar [data-cat]').forEach(function(chip){
+    chip.onclick=function(){
+      var c=chip.dataset.cat; EIXVIEW.activeCats[c]=!EIXVIEW.activeCats[c];
+      var on=EIXVIEW.activeCats[c];
+      chip.classList.toggle('on',on);
+      chip.style.background=on?EIX_CAT_COLOR[c]:''; chip.style.borderColor=on?EIX_CAT_COLOR[c]:''; chip.style.color=on?'#1b1405':'';
+      poiGroup.querySelectorAll('[data-cat="'+c+'"]').forEach(function(n){ n.style.display=on?'':'none'; });
+    };
+  });
+  svg.addEventListener('click',function(e){ if(e.target===svg) clearHi(); });
+}
+function eixRenderLesson(body, verticals){
+  var CHUNK=6;
+  var chunks=[]; for(var i=0;i<verticals.length;i+=CHUNK) chunks.push(verticals.slice(i,i+CHUNK));
+  if(EIXVIEW.lessonIdx===undefined) EIXVIEW.lessonIdx=0;
+  var idx=EIXVIEW.lessonIdx;
+  var htm='<p class="tiny muted" style="margin-bottom:12px">'+esc(t('eixLessonIntro'))+' '+esc(t('eixBlock'))+' '+(idx+1)+' '+esc(t('eixOf'))+' '+chunks.length+'.</p>';
+  chunks.forEach(function(chunk,ci){
+    if(ci>idx) return;
+    htm+='<div class="card pad" style="margin-bottom:10px"><b class="tiny muted" style="text-transform:uppercase;letter-spacing:.04em">'+esc(t('eixBlock'))+' '+(ci+1)+'</b><div style="margin-top:8px">'+
+      chunk.map(function(v){return '<span class="pill neutral" style="margin:3px 4px 0 0;font-size:.84rem;padding:6px 11px">'+esc(v.name)+'</span>';}).join('')+'</div></div>';
+  });
+  if(idx<chunks.length-1){
+    htm+='<button class="btn primary" id="eix-next">'+esc(t('eixGotIt'))+'</button>';
+  } else {
+    htm+='<div class="card pad" style="margin-bottom:10px">'+esc(t('eixLessonDone'))+'</div>'+
+      '<button class="btn" id="eix-restart">'+esc(t('eixRestart'))+'</button>';
+  }
+  body.innerHTML=htm;
+  var nx=document.getElementById('eix-next'); if(nx) nx.onclick=function(){ EIXVIEW.lessonIdx++; eixRenderLesson(body,verticals); };
+  var rs=document.getElementById('eix-restart'); if(rs) rs.onclick=function(){ EIXVIEW.lessonIdx=0; eixRenderLesson(body,verticals); };
+}
+function eixRenderQuiz(body, verticals){
+  body.innerHTML=
+    '<div id="eix-quizmap" class="card" style="overflow:auto;padding:10px;margin-bottom:14px"></div>'+
+    '<div class="center" style="font-weight:700;margin-bottom:6px" id="eix-qtext"></div>'+
+    '<div class="tiny muted center" style="margin-bottom:12px" id="eix-score"></div>'+
+    '<div class="stack" style="gap:8px" id="eix-opts"></div>';
+  var mapEl=document.getElementById('eix-quizmap');
+  var built=eixBuildSvg(verticals, verticals.length? window.EIXAMPLE.horizontals:[], window.EIXAMPLE);
+  var scale=Math.min(1, (Math.min(window.innerWidth,480)-32)/built.gridW);
+  built.svg.setAttribute('width', Math.round(built.gridW*scale));
+  built.svg.setAttribute('height', Math.round(built.gridH*scale));
+  mapEl.appendChild(built.svg);
+
+  function scoreline(){ return t('eixStreak')+': '+EIXVIEW.quizStreak+' · '+t('eixAsked')+': '+EIXVIEW.quizTotal; }
+  document.getElementById('eix-score').textContent=scoreline();
+
+  function newQuestion(){
+    var opts=document.getElementById('eix-opts'); opts.innerHTML='';
+    Object.values(built.vLines).forEach(function(l){ l.classList.remove('hi'); });
+    var target=verticals[Math.floor(Math.random()*verticals.length)];
+    built.vLines[target.id].classList.add('hi');
+    document.getElementById('eix-qtext').textContent=t('eixQ');
+    var pool=verticals.filter(function(v){return v.id!==target.id;});
+    var wrongs=[]; while(wrongs.length<3 && pool.length){ var i2=Math.floor(Math.random()*pool.length); wrongs.push(pool.splice(i2,1)[0]); }
+    var choices=wrongs.concat([target]).sort(function(){return Math.random()-.5;});
+    choices.forEach(function(c){
+      var b=document.createElement('button'); b.className='btn sm'; b.style.width='100%'; b.textContent=c.name;
+      b.onclick=function(){
+        EIXVIEW.quizTotal++;
+        if(c.id===target.id){ b.style.background='var(--ok)'; b.style.borderColor='var(--ok)'; b.style.color='#04241a'; EIXVIEW.quizStreak++; }
+        else { b.style.background='var(--ko)'; b.style.borderColor='var(--ko)'; b.style.color='#2a0509'; EIXVIEW.quizStreak=0;
+          Array.from(opts.children).forEach(function(o){ if(o.textContent===target.name){ o.style.background='var(--ok)'; o.style.borderColor='var(--ok)'; o.style.color='#04241a'; } });
+        }
+        document.getElementById('eix-score').textContent=scoreline();
+        Array.from(opts.children).forEach(function(o){ o.disabled=true; });
+        setTimeout(newQuestion,900);
+      };
+      opts.appendChild(b);
+    });
+  }
+  newQuestion();
 }
 
 /* ---------------- SETTINGS ---------------- */

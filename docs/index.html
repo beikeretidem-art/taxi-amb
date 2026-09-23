@@ -238,7 +238,24 @@ main{padding:18px 0 80px}
 .tabs button{flex:1;padding:9px;border-radius:9px;font-size:.83rem;font-weight:650;color:var(--fg2)}
 .tabs button.on{background:var(--bg2);color:var(--fg);box-shadow:var(--sh)}
 
-.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--bg2);font-size:.8rem;font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--bg2);font-size:.8rem;font-weight:600;flex:none}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#1b1405}
+.chip .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+
+/* ---- mapa Eixample (prova pilot) ---- */
+.eixline-v{stroke:var(--fg3);stroke-width:2.4;cursor:pointer}
+.eixline-v:hover{stroke:var(--acc2)}
+.eixline-v.hi{stroke:var(--acc);stroke-width:5}
+.eixline-h{stroke:var(--line2);stroke-width:2.4;cursor:pointer}
+.eixline-h:hover{stroke:var(--acc2)}
+.eixline-h.hi{stroke:var(--acc);stroke-width:5}
+.eixlabel-v{fill:var(--fg2);font-size:10px;text-anchor:end}
+.eixlabel-v.hi{fill:var(--acc);font-weight:700}
+.eixlabel-h{fill:var(--fg2);font-size:10px}
+.eixlabel-h.hi{fill:var(--acc);font-weight:700}
+.eixdiag{stroke:var(--acc2);stroke-width:1.4;stroke-dasharray:6 4;opacity:.5}
+.eixpoi{stroke:var(--bg2);stroke-width:1.5;cursor:pointer}
+.eixpoi-ring{fill:none;stroke-width:2;opacity:.5}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
 
 .fade{animation:fade .28s ease}
@@ -8496,6 +8513,127 @@ q('cst','s-gra',
 
 </script>
 <script>
+/* ---------------------------------------------------------------------
+ * Dades del mòdul "Mapa mut i Eixample" (prova pilot).
+ * Transcrites del manual (Curs Online Credencial del Taxi 2026, Escola
+ * del Taxi Incrementa), pàg. 127-138 i 164-165 (SEU-2 Eixample).
+ * Fets (noms de carrers, adreces): no tenen drets d'autor. No incloure
+ * aquí text redactat pel manual (preguntes, explicacions).
+ * No editar a mà des de build.py; és un fitxer font més de src/.
+ * ------------------------------------------------------------------- */
+window.EIXAMPLE = {
+  barris: ['la Nova Esquerra de l’Eixample', 'l’Antiga Esquerra de l’Eixample',
+    'la Dreta de l’Eixample', 'la Sagrada Família', 'Sant Antoni', 'el Fort Pienc'],
+  verticals: [
+    { id: 'tarragona', name: 'Tarragona', order: 1, from: 'Pl. Espanya', to: 'Pl. Països Catalans', sentit: 'mar', notes: ['Doble sentit exclusiu Bus-Taxi', 'Continuació de Numància'] },
+    { id: 'llanca', name: 'Llançà / Nicaragua', order: 2, from: 'Sepúlveda', to: 'Travessera de les Corts', notes: ['Nom canvia a Nicaragua passat Av. Roma', 'Tallat entre Diputació i Aragó pel Parc Miró'] },
+    { id: 'vilamari', name: 'Vilamarí', order: 3, from: 'Av. Paral·lel', to: 'Provença', sentit: 'mar' },
+    { id: 'entenca', name: 'Entença', order: 4, from: 'Av. Paral·lel', to: 'Diagonal', sentit: 'muntanya', notes: ['Continua com Dr. Fleming'] },
+    { id: 'rocafort', name: 'Rocafort', order: 5, from: 'Av. Paral·lel', to: 'Av. Josep Tarradellas', sentit: 'mar' },
+    { id: 'calabria', name: 'Calàbria', order: 6, from: 'Av. Paral·lel', to: 'Londres', sentit: 'muntanya' },
+    { id: 'viladomat', name: 'Viladomat', order: 7, from: 'Av. Paral·lel', to: 'Av. Josep Tarradellas', sentit: 'mar' },
+    { id: 'comteborrell', name: 'Comte Borrell', order: 8, from: 'Av. Paral·lel', to: 'Av. Josep Tarradellas', sentit: 'mar', notes: ['Peatonal entre Tamarit i Manso', 'Tallat entre Rosselló i París per l’Escola Industrial'] },
+    { id: 'comteurgell', name: 'Comte Urgell', order: 9, from: 'Rda. St. Antoni', to: 'París', sentit: 'variable', notes: ['Continuació inferior: Rda. St. Pau'] },
+    { id: 'villarroel', name: 'Villarroel', order: 10, from: 'Rda. St. Antoni', to: 'Diagonal', sentit: 'mar' },
+    { id: 'casanova', name: 'Casanova', order: 11, from: 'Rda. St. Antoni', to: 'Travessera de Gràcia', sentit: 'muntanya' },
+    { id: 'muntaner', name: 'Muntaner', order: 12, from: 'Rda. St. Antoni (Pl. Goya)', to: 'Pl. Bonanova', sentit: 'mar' },
+    { id: 'aribau', name: 'Aribau', order: 13, from: 'Pl. Universitat', to: 'Via Augusta', sentit: 'muntanya' },
+    { id: 'enricgranados', name: 'Enric Granados', order: 14, from: 'Diagonal', to: 'Diputació', sentit: 'mar', notes: ['Peatonal entre Diagonal-París i Consell de Cent-Diputació'] },
+    { id: 'balmes', name: 'Balmes', order: 15, from: 'Pelai', to: 'Pl. John Kennedy / Pl. Molina', notes: ['Doble sentit entre Pl. Molina i Pl. John Kennedy'] },
+    { id: 'ramblacatalunya', name: 'Rbla. Catalunya', order: 16, from: 'Pl. Catalunya', to: 'Diagonal', notes: ['Doble sentit'] },
+    { id: 'pggracia', name: 'Pg. de Gràcia', order: 17, from: 'Pl. Catalunya', to: 'Pl. Nicolás Salmerón', notes: ['Doble sentit', 'Continua com Gran de Gràcia', 'Pl. Cinc d’Oros a la confluència amb Diagonal'] },
+    { id: 'pauclaris', name: 'Pau Claris', order: 18, from: 'Pl. Urquinaona', to: 'Còrsega', sentit: 'mar' },
+    { id: 'rogerlluria', name: 'Roger de Llúria', order: 19, from: 'Pl. Urquinaona', to: 'Còrsega', sentit: 'muntanya' },
+    { id: 'bruc', name: 'Bruc', order: 20, from: 'Trafalgar', to: 'Còrsega', sentit: 'mar' },
+    { id: 'girona', name: 'Girona', order: 21, from: 'Rda. St. Pere', to: 'Còrsega', sentit: 'muntanya', notes: ['Continuació inferior: Méndez Núñez'] },
+    { id: 'bailen', name: 'Bailèn', order: 22, from: 'Rda. St. Pere', to: 'Trav. de Gràcia', sentit: 'mar' },
+    { id: 'pgstjoan', name: 'Pg. St. Joan', order: 23, from: 'Rda. St. Pere', to: 'Trav. de Gràcia', notes: ['Doble sentit', 'Pl. Mn. Jacint Verdaguer amb Diagonal', 'Pl. Tetuán amb Gran Via'] },
+    { id: 'rogerflor', name: 'Roger de Flor', order: 24, from: 'Pg. Pujades', to: 'Trav. de Gràcia', sentit: 'muntanya' },
+    { id: 'napols', name: 'Nàpols', order: 25, from: 'Pg. Pujades', to: 'Trav. de Gràcia', sentit: 'mar' },
+    { id: 'sicilia', name: 'Sicília', order: 26, from: 'Ali-Bei', to: 'Trav. de Gràcia', sentit: 'muntanya' },
+    { id: 'sardenya', name: 'Sardenya', order: 27, from: 'Ramón Turró', to: 'Pl. Sanllehy', sentit: 'mar', notes: ['Continuació inferior: Ramón Trias Fargas'] },
+    { id: 'marina', name: 'Marina', order: 28, from: 'Pl. Voluntaris Olímpics', to: 'Diputació', notes: ['Peatonal entre València i Provença'] },
+    { id: 'lepant', name: 'Lepant', order: 29, from: 'Av. Meridiana', to: 'Rda. Guinardó', sentit: 'mar' },
+    { id: 'padilla', name: 'Padilla', order: 30, from: 'Av. Meridiana', to: 'Rda. Guinardó', sentit: 'muntanya' },
+    { id: 'castillejos', name: 'Castillejos', order: 31, from: 'Av. Meridiana', to: 'Av. Mare de Déu de Montserrat', notes: ['Tall per escales entre Rda. Guinardó i Niça (no es pot circular)'] },
+    { id: 'cartagena', name: 'Cartagena', order: 32, from: 'Consell de Cent', to: 'Av. Mare de Déu de Montserrat', notes: ['Doble sentit entre Rda. Guinardó i Av. Mare de Déu de Montserrat'] },
+    { id: 'dosdemaig', name: 'Dos de Maig', order: 33, from: 'Consell de Cent', to: 'St. Antoni Mª Claret', sentit: 'mar' },
+  ],
+  horizontals: [
+    { id: 'granvia', name: 'Gran Via de les Corts Catalanes', order: 1, side: 'both' },
+    { id: 'diputacio', name: 'Diputació', order: 2, side: 'both', notes: ['Tarragona↔Padilla sentit Llobregat'] },
+    { id: 'consellcent', name: 'Consell de Cent', order: 3, side: 'both', notes: ['Creu Coberta↔Av. Meridiana'] },
+    { id: 'arago', name: 'Aragó', order: 4, side: 'both', notes: ['Tarragona↔Lope de Vega / Av. Meridiana', 'Continua com Rbla. Guipúscoa'] },
+    { id: 'valencia', name: 'València', order: 5, side: 'both', notes: ['Tarragona↔Espronceda', 'Continua com Huelva'] },
+    { id: 'mallorca', name: 'Mallorca', order: 6, side: 'both', notes: ['Rector Triadó↔Clot', 'Absorbida per Av. Roma entre Tarragona i Rocafort'] },
+    { id: 'provenca', name: 'Provença', order: 7, side: 'both', notes: ['Pl. Països Catalans↔Rogent/Independència'] },
+    { id: 'rossello', name: 'Rosselló', order: 8, side: 'both', notes: ['Tallat pel Hospital Clínic (Villarroel-Casanova)', 'Peatonal entre Comte Urgell i Villarroel'] },
+    { id: 'corsega', name: 'Còrsega', order: 9, side: 'both', notes: ['Av. Josep Tarradellas↔Pg. Maragall', 'Tallada per l’Escola Industrial', 'Peatonal entre Pg. Gràcia i Rbla. Catalunya'] },
+    { id: 'buenosaires', name: 'Buenos Aires', order: 6.3, side: 'esquerra', from: 'Av. Sarrià', to: 'Comte Borrell' },
+    { id: 'londres', name: 'Londres', order: 6.5, side: 'esquerra', from: 'Av. Josep Tarradellas', to: 'Aribau' },
+    { id: 'paris', name: 'París', order: 6.7, side: 'esquerra', from: 'Av. Josep Tarradellas', to: 'Balmes' },
+    { id: 'sepulveda', name: 'Sepúlveda', order: 1.5, side: 'esquerra' },
+    { id: 'floridablanca', name: 'Floridablanca', order: 1.7, side: 'esquerra' },
+    { id: 'tamarit', name: 'Tamarit', order: 1.8, side: 'esquerra' },
+    { id: 'manso', name: 'Manso', order: 1.9, side: 'esquerra' },
+    { id: 'parlament', name: 'Parlament', order: 1.95, side: 'esquerra' },
+    { id: 'santantonimclaret', name: 'St. Antoni Mª Claret', order: 9.3, side: 'dreta' },
+    { id: 'industria', name: 'Indústria', order: 9.4, side: 'dreta' },
+    { id: 'casp', name: 'Casp', order: 2.3, side: 'dreta' },
+    { id: 'ausiasmarc', name: 'Ausiàs Marc', order: 2.4, side: 'dreta' },
+    { id: 'alibei', name: 'Ali Bei', order: 2.5, side: 'dreta' },
+    { id: 'avvilanova', name: 'Av. Vilanova', order: 2.6, side: 'dreta' },
+    { id: 'almogavers', name: 'Almogàvers', order: 2.7, side: 'dreta' },
+    { id: 'travgracia', name: 'Travessera de Gràcia', order: 10, side: 'both', notes: ['Límit muntanya de l’Eixample'] },
+  ],
+  diagonals: [
+    { id: 'avsarria', name: 'Av. Sarrià' }, { id: 'avroma', name: 'Av. Roma' },
+    { id: 'avmistral', name: 'Av. Mistral' }, { id: 'avdiagonal', name: 'Av. Diagonal', notes: ['Travessa tot l’Eixample'] },
+    { id: 'avgaudi', name: 'Av. Gaudí' }, { id: 'rdauniversitat', name: 'Rda. Universitat' },
+    { id: 'rdastpere', name: 'Rda. St. Pere' }, { id: 'ribes', name: 'Ribes' }, { id: 'enamorats', name: 'Enamorats' },
+  ],
+};
+
+window.EIXAMPLE_POIS = [
+  { name: 'Sagrada Família', addr: 'Sardenya / Marina (Pl. Sagrada Família)', near: 'sardenya', cat: 'monument' },
+  { name: 'Casa Amatller', addr: 'Pg. de Gràcia, 41', near: 'pggracia', cat: 'monument' },
+  { name: 'Casa Batlló', addr: 'Pg. de Gràcia, 43', near: 'pggracia', cat: 'monument' },
+  { name: 'Casa Lleó Morera', addr: 'Pg. de Gràcia, 35', near: 'pggracia', cat: 'monument' },
+  { name: 'Casa Milà (La Pedrera)', addr: 'Pg. de Gràcia, 92', near: 'pggracia', cat: 'monument' },
+  { name: 'Casa Terrades (de les Punxes)', addr: 'Diagonal, 416/420', near: 'bruc', cat: 'monument' },
+  { name: 'Monument a Francesc Macià', addr: 'Pl. Catalunya', near: 'balmes', cat: 'monument' },
+  { name: 'Monument a Rafael Casanova', addr: 'Rda. Sant Pere, 41', near: 'girona', cat: 'monument' },
+  { name: 'Museu Egipci', addr: 'València, 284', near: 'pauclaris', cat: 'museu' },
+  { name: 'Fundació Tàpies', addr: 'Aragó, 265', near: 'ramblacatalunya', cat: 'museu' },
+  { name: 'Auditori de Barcelona', addr: 'Lepant, 150', near: 'lepant', cat: 'cultura' },
+  { name: 'Conservatori Superior de Música', addr: 'Bruc, 110', near: 'bruc', cat: 'cultura' },
+  { name: 'Hospital Clínic', addr: 'Villarroel, 170', near: 'villarroel', cat: 'hospital' },
+  { name: 'Hospital Dos de Maig', addr: 'Dos de Maig, 301', near: 'dosdemaig', cat: 'hospital' },
+  { name: 'Hospital de Nens de Barcelona', addr: 'Consell de Cent, 437', near: 'rogerflor', cat: 'hospital' },
+  { name: 'Cinema Comèdia', addr: 'Pg. de Gràcia, 13', near: 'pggracia', cat: 'cinema' },
+  { name: 'Hotel Majestic Barcelona', addr: 'Pg. de Gràcia, 68', near: 'pggracia', cat: 'hotel' },
+  { name: 'Hotel Palace (antic Ritz)', addr: 'Gran Via, 668', near: 'rogerlluria', cat: 'hotel' },
+  { name: 'Teatre Tívoli', addr: 'Casp, 8', near: 'pauclaris', cat: 'teatre' },
+  { name: 'Teatre Nacional de Catalunya', addr: 'Pl. de les Arts', near: 'lepant', cat: 'teatre' },
+  { name: 'Estació del Nord', addr: 'Ali Bei, 80', near: 'napols', cat: 'transport' },
+  { name: 'El Corte Inglés Pl. Catalunya', addr: 'Pl. Catalunya, 14', near: 'balmes', cat: 'comerc' },
+  { name: 'El Corte Inglés Francesc Macià', addr: 'Diagonal, 471', near: 'villarroel', cat: 'comerc' },
+  { name: 'Escola Industrial', addr: 'Urgell, 187', near: 'comteurgell', cat: 'edifici' },
+  { name: 'La Model (presó)', addr: 'Entença, 155', near: 'entenca', cat: 'edifici' },
+  { name: 'Pl. de Toros Monumental', addr: 'Gran Via / Marina', near: 'marina', cat: 'edifici' },
+  { name: 'Parc Joan Miró', addr: 'Tarragona / Aragó / Vilamarí / Diputació', near: 'tarragona', cat: 'parc' },
+  { name: 'Casa Calvet', addr: 'Casp, 48', near: 'rogerlluria', cat: 'monument' },
+  { name: 'Universitat de Barcelona', addr: 'Gran Via, 585', near: 'villarroel', cat: 'edifici' },
+  { name: 'Monument a Dr. Robert', addr: 'Pl. Tetuán', near: 'pgstjoan', cat: 'monument' },
+  { name: 'Hotel Mandarín Oriental', addr: 'Pg. de Gràcia, 38', near: 'pggracia', cat: 'hotel' },
+  { name: 'Palau Macaya - CaixaForum', addr: 'Pg. de Sant Joan, 108', near: 'pgstjoan', cat: 'cultura' },
+  { name: 'Mercat del Ninot', addr: 'Mallorca, 131-133', near: 'casanova', cat: 'mercat' },
+  { name: 'Hospital Univ. Sagrat Cor', addr: 'Viladomat, 288', near: 'viladomat', cat: 'hospital' },
+  { name: 'Mercat de Sant Antoni', addr: 'Urgell, 1', near: 'comteurgell', cat: 'mercat' },
+];
+
+</script>
+<script>
 /* ===========================================================
    Credencial Taxi AMB 2026 — app d'estudi / app de estudio
    =========================================================== */
@@ -8749,7 +8887,44 @@ var T = {
   best:{ca:'El teu punt fort',es:'Tu punto fuerte'},
   new:{ca:'noves',es:'nuevas'},
   due:{ca:'per repassar',es:'para repasar'},
-  progressNote:{ca:'El progrés puja quan encertes una pregunta diverses vegades separades en el temps.',es:'El progreso sube cuando aciertas una pregunta varias veces separadas en el tiempo.'}
+  progressNote:{ca:'El progrés puja quan encertes una pregunta diverses vegades separades en el temps.',es:'El progreso sube cuando aciertas una pregunta varias veces separadas en el tiempo.'},
+  beta:{ca:'Prova pilot',es:'Prueba piloto'},
+  eixMap:{ca:'Mapa de l’Eixample',es:'Mapa del Eixample'},
+  eixMapD:{ca:'Aprèn els carrers amb un mapa interactiu',es:'Aprende las calles con un mapa interactivo'},
+  eixExplore:{ca:'Explorar',es:'Explorar'},
+  eixLesson:{ca:'Lliçó',es:'Lección'},
+  eixTest:{ca:'Test',es:'Test'},
+  eixNames:{ca:'Noms',es:'Nombres'},
+  eixDiag:{ca:'Diagonals',es:'Diagonales'},
+  eixPoi:{ca:'Punts d’interès',es:'Puntos de interés'},
+  eixBarris:{ca:'Barris',es:'Barrios'},
+  eixBarrisTitle:{ca:'Barris de l’Eixample',es:'Barrios del Eixample'},
+  eixFrom:{ca:'De',es:'De'},
+  eixTo:{ca:'a',es:'a'},
+  eixSide:{ca:'Costat',es:'Lado'},
+  eixSideBoth:{ca:'travessa tot l’Eixample',es:'atraviesa todo el Eixample'},
+  eixNear:{ca:'Punts d’interès a prop',es:'Puntos de interés cerca'},
+  eixLessonIntro:{ca:'Aprèn els carrers verticals en blocs, d’oest (Sants) a est (Poblenou).',es:'Aprende las calles verticales en bloques, de oeste (Sants) a este (Poblenou).'},
+  eixBlock:{ca:'Bloc',es:'Bloque'},
+  eixOf:{ca:'de',es:'de'},
+  eixGotIt:{ca:'Ho tinc — següent bloc',es:'Ya me lo sé — siguiente bloque'},
+  eixLessonDone:{ca:'Última tanda revelada. Passa al Test per comprovar què recordes.',es:'Última tanda revelada. Pasa al Test para comprobar qué recuerdas.'},
+  eixRestart:{ca:'Reiniciar lliçó',es:'Reiniciar lección'},
+  eixQ:{ca:'Quin carrer és el ressaltat?',es:'¿Qué calle es la resaltada?'},
+  eixStreak:{ca:'Ratxa',es:'Racha'},
+  eixAsked:{ca:'Preguntes',es:'Preguntas'},
+  catMonument:{ca:'Monuments',es:'Monumentos'},
+  catMuseu:{ca:'Museus',es:'Museos'},
+  catHospital:{ca:'Hospitals',es:'Hospitales'},
+  catHotel:{ca:'Hotels',es:'Hoteles'},
+  catTeatre:{ca:'Teatres',es:'Teatros'},
+  catCinema:{ca:'Cinemes',es:'Cines'},
+  catCultura:{ca:'Cultura',es:'Cultura'},
+  catComerc:{ca:'Comerç',es:'Comercio'},
+  catEdifici:{ca:'Edificis',es:'Edificios'},
+  catParc:{ca:'Parcs',es:'Parques'},
+  catTransport:{ca:'Transport',es:'Transporte'},
+  catMercat:{ca:'Mercats',es:'Mercados'}
 };
 function t(k,r){var s=(T[k]&&T[k][S.lang])||k; if(r){for(var p in r){s=s.split(p).join(r[p]);}} return s;}
 function L(o){ return o? (o[S.lang]||o.ca||o.es||'') : ''; }
@@ -8780,7 +8955,7 @@ function snapSession(){
 }
 function snapView(){
   var n=VIEW.name;
-  S.view = (n==='cats'||n==='stats'||n==='errors'||n==='cat') ? {name:n,arg:VIEW.arg} : null;
+  S.view = (n==='cats'||n==='stats'||n==='errors'||n==='cat'||n==='eixmap') ? {name:n,arg:VIEW.arg} : null;
 }
 function save(){
   try{ snapSession(); snapView(); }catch(e){}
@@ -8978,6 +9153,7 @@ function render(){
   else if(v==='levelIntro') viewIntro('level');
   else if(v==='mockIntro') viewIntro('mock');
   else if(v==='errors') viewErrors();
+  else if(v==='eixmap') viewEixMap();
   else viewHome();
 }
 
@@ -9062,6 +9238,7 @@ function viewHome(){
     tile('go-terr',IC.map,t('terr'),t('terrD'))+
     tile('go-cats',IC.grid,t('categories'),t('catsD'))+
     tile('go-all',IC.flip,t('allRandom'),t('allRandomD'))+
+    tile('go-eixmap',IC.map,t('eixMap')+' · '+t('beta'),t('eixMapD'))+
   '</div>';
 
   /* modules */
@@ -9091,6 +9268,7 @@ function viewHome(){
   document.getElementById('go-cats').onclick=function(){ go('cats'); };
   document.getElementById('go-all').onclick=function(){ startSession({mode:'all',pool:DB,n:Math.max(S.len,20),title:t('allRandom')}); };
   document.getElementById('go-stats').onclick=function(){ go('stats'); };
+  document.getElementById('go-eixmap').onclick=function(){ go('eixmap'); };
   app.querySelectorAll('[data-mod]').forEach(function(el){
     el.onclick=function(){ go('cat',el.dataset.mod); };
   });
@@ -9626,6 +9804,239 @@ function viewStats(){
   app.querySelectorAll('[data-sub]').forEach(function(el){
     el.onclick=function(){ var s=el.dataset.sub; startSession({mode:'sub',pool:BYSUB[s]||[],n:S.len,title:L(SUBS[s])}); };
   });
+}
+
+/* ---------------- MAPA EIXAMPLE (prova pilot) ---------------- */
+var EIXVIEW = { mode:'explore', quizStreak:0, quizTotal:0, activeCats:null };
+var EIX_CAT_COLOR = { monument:'#e8a020', museu:'#3b82c4', hospital:'#d64550', hotel:'#9b6fd1',
+  teatre:'#2f9e6e', cinema:'#2f9e6e', cultura:'#3b82c4', comerc:'#c99a1f', edifici:'#8b94a3',
+  parc:'#4c9a4c', transport:'#2f80c0', mercat:'#c99a1f' };
+function eixCatLabel(c){ return t('cat'+c.charAt(0).toUpperCase()+c.slice(1)); }
+function eixDetail(html){
+  var sh=document.getElementById('sheet');
+  sh.querySelector('.panel').innerHTML='<div class="grip"></div>'+html+
+    '<button class="btn ghost" id="eix-close" style="margin-top:14px">'+esc(t('ok'))+'</button>';
+  sh.classList.add('on');
+  document.getElementById('eix-close').onclick=closeSheet;
+}
+function viewEixMap(){
+  var D=window.EIXAMPLE, POIS=window.EIXAMPLE_POIS;
+  if(!D || !POIS){ go('home'); return; }
+  var verticals=D.verticals.slice().sort(function(a,b){return a.order-b.order;});
+  var horizontals=D.horizontals.slice().sort(function(a,b){return a.order-b.order;});
+  if(!EIXVIEW.activeCats){
+    EIXVIEW.activeCats={};
+    POIS.forEach(function(p){ EIXVIEW.activeCats[p.cat]=true; });
+  }
+
+  var html='<div class="wrap stack fade">'+
+    '<div><h1 style="margin-bottom:2px">'+esc(t('eixMap'))+'</h1>'+
+    '<p class="tiny muted">'+esc(t('beta'))+' · '+esc(t('eixMapD'))+'</p></div>'+
+    '<div class="tabs"><button data-eixmode="explore" class="'+(EIXVIEW.mode==='explore'?'on':'')+'">'+esc(t('eixExplore'))+'</button>'+
+    '<button data-eixmode="lesson" class="'+(EIXVIEW.mode==='lesson'?'on':'')+'">'+esc(t('eixLesson'))+'</button>'+
+    '<button data-eixmode="quiz" class="'+(EIXVIEW.mode==='quiz'?'on':'')+'">'+esc(t('eixTest'))+'</button></div>'+
+    '<div id="eix-body"></div>'+
+  '</div>';
+  app.innerHTML=html;
+  app.querySelectorAll('[data-eixmode]').forEach(function(b){
+    b.onclick=function(){ EIXVIEW.mode=b.dataset.eixmode; viewEixMap(); };
+  });
+
+  var body=document.getElementById('eix-body');
+  if(EIXVIEW.mode==='lesson'){ eixRenderLesson(body, verticals); return; }
+  if(EIXVIEW.mode==='quiz'){ eixRenderQuiz(body, verticals); return; }
+  eixRenderExplore(body, D, verticals, horizontals, POIS);
+}
+function eixBuildSvg(verticals, horizontals, D){
+  var W=verticals.length, colW=36, padL=92, padR=26;
+  var rowH=34, padT=32, padB=26;
+  var gridW=padL+(W-1)*colW+padR, gridH=padT+(horizontals.length-1)*rowH+padB;
+  function vx(order){ var i=verticals.findIndex(function(v){return v.order===order;}); return padL+i*colW; }
+  var ns='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(ns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  var svg=el('svg',{width:gridW,height:gridH,viewBox:'0 0 '+gridW+' '+gridH});
+  var hLines={}, hLabels={};
+  horizontals.forEach(function(hh,i){
+    var y=padT+i*rowH;
+    var x0=hh.side==='dreta'? vx(17):padL;
+    var x1=hh.side==='esquerra'? vx(16):(padL+(W-1)*colW);
+    var line=el('line',{x1:x0,y1:y,x2:x1,y2:y,class:'eixline-h','data-id':hh.id});
+    svg.appendChild(line); hLines[hh.id]=line;
+    var lbl=el('text',{x:x1+6,y:y+3,class:'eixlabel-h','data-id':hh.id});
+    lbl.textContent=hh.name; svg.appendChild(lbl); hLabels[hh.id]=lbl;
+  });
+  var vLines={}, vLabels={};
+  verticals.forEach(function(v,i){
+    var x=padL+i*colW;
+    var line=el('line',{x1:x,y1:padT,x2:x,y2:padT+(horizontals.length-1)*rowH,class:'eixline-v','data-id':v.id});
+    svg.appendChild(line); vLines[v.id]=line;
+    var lbl=el('text',{x:x+4,y:padT-9,class:'eixlabel-v',transform:'rotate(-55 '+(x+4)+' '+(padT-9)+')','data-id':v.id});
+    lbl.textContent=v.name; svg.appendChild(lbl); vLabels[v.id]=lbl;
+  });
+  var diagSpecs=[0.06,0.16,0.30,0.50,0.68,0.20,0.62,0.80,0.90];
+  var diagGroup=el('g',{'class':'eix-diaggroup'});
+  D.diagonals.forEach(function(dg,i){
+    var f=diagSpecs[i]!==undefined? diagSpecs[i]:(i/D.diagonals.length);
+    var xTop=padL+f*(W-1)*colW;
+    diagGroup.appendChild(el('line',{x1:xTop-36,y1:padT-2,x2:xTop+36,y2:padT+(horizontals.length-1)*rowH+2,class:'eixdiag'}));
+  });
+  svg.appendChild(diagGroup);
+  return {svg:svg, vx:vx, vLines:vLines, vLabels:vLabels, hLines:hLines, hLabels:hLabels, diagGroup:diagGroup, gridW:gridW, gridH:gridH, rowH:rowH, padT:padT, horizontals:horizontals};
+}
+function eixRenderExplore(body, D, verticals, horizontals, POIS){
+  var built=eixBuildSvg(verticals, horizontals, D);
+  var svg=built.svg;
+  var poiGroup=document.createElementNS('http://www.w3.org/2000/svg','g');
+  var poiCountByCol={};
+  POIS.forEach(function(p){
+    var v=verticals.find(function(vv){return vv.id===p.near;});
+    if(!v) return;
+    var x=built.vx(v.order);
+    var slot=poiCountByCol[v.id]||0; poiCountByCol[v.id]=slot+1;
+    var y=built.padT+24+(slot%(built.horizontals.length-2))*(built.rowH*0.92)+(Math.floor(slot/(built.horizontals.length-2))*10);
+    var ring=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ring.setAttribute('cx',x); ring.setAttribute('cy',y); ring.setAttribute('r',9);
+    ring.setAttribute('class','eixpoi-ring'); ring.setAttribute('stroke',EIX_CAT_COLOR[p.cat]||'#888'); ring.setAttribute('data-cat',p.cat);
+    var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',6);
+    c.setAttribute('class','eixpoi'); c.setAttribute('fill',EIX_CAT_COLOR[p.cat]||'#888'); c.setAttribute('data-cat',p.cat);
+    c.addEventListener('click',function(e){ e.stopPropagation(); eixDetail('<b style="display:block;margin-bottom:6px;font-size:1rem">'+esc(p.name)+'</b>'+
+      '<div class="tiny muted">'+esc(p.addr)+'</div><span class="pill" style="margin-top:8px;background:'+(EIX_CAT_COLOR[p.cat]||'#888')+';color:#1b1405;font-weight:700">'+esc(eixCatLabel(p.cat))+'</span>'); });
+    poiGroup.appendChild(ring); poiGroup.appendChild(c);
+  });
+  svg.appendChild(poiGroup);
+
+  function clearHi(){
+    Object.values(built.vLines).forEach(function(l){l.classList.remove('hi');});
+    Object.values(built.vLabels).forEach(function(l){l.classList.remove('hi');});
+    Object.values(built.hLines).forEach(function(l){l.classList.remove('hi');});
+    Object.values(built.hLabels).forEach(function(l){l.classList.remove('hi');});
+  }
+  verticals.forEach(function(v){
+    built.vLines[v.id].addEventListener('click',function(){
+      clearHi(); built.vLines[v.id].classList.add('hi'); built.vLabels[v.id].classList.add('hi');
+      var pois=POIS.filter(function(p){return p.near===v.id;});
+      eixDetail('<b style="display:block;margin-bottom:6px;font-size:1rem">'+esc(v.name)+'</b>'+
+        (v.from? '<div>'+esc(t('eixFrom'))+' <b>'+esc(v.from)+'</b> '+esc(t('eixTo'))+' <b>'+esc(v.to||'?')+'</b></div>':'')+
+        (v.sentit? '<span class="pill neutral" style="margin-top:6px">'+esc(v.sentit)+'</span>':'')+
+        (v.notes? v.notes.map(function(n){return '<div class="tiny muted" style="margin-top:6px">· '+esc(n)+'</div>';}).join(''):'')+
+        (pois.length? '<div class="tiny muted" style="margin-top:10px"><b style="color:var(--fg)">'+esc(t('eixNear'))+'</b><br>'+esc(pois.map(function(p){return p.name;}).join(', '))+'</div>':''));
+    });
+  });
+  horizontals.forEach(function(hh){
+    built.hLines[hh.id].addEventListener('click',function(){
+      clearHi(); built.hLines[hh.id].classList.add('hi'); built.hLabels[hh.id].classList.add('hi');
+      eixDetail('<b style="display:block;margin-bottom:6px;font-size:1rem">'+esc(hh.name)+'</b>'+
+        '<span class="pill neutral">'+esc(t('eixSide'))+': '+(hh.side==='both'? esc(t('eixSideBoth')):esc(hh.side))+'</span>'+
+        (hh.notes? hh.notes.map(function(n){return '<div class="tiny muted" style="margin-top:6px">· '+esc(n)+'</div>';}).join(''):''));
+    });
+  });
+
+  var catBar='';
+  Object.keys(EIX_CAT_COLOR).forEach(function(c){
+    if(!POIS.some(function(p){return p.cat===c;})) return;
+    var on=EIXVIEW.activeCats[c];
+    catBar+='<button class="chip'+(on?' on':'')+'" data-cat="'+c+'" style="'+(on?'background:'+EIX_CAT_COLOR[c]+';border-color:'+EIX_CAT_COLOR[c]+';color:#1b1405':'')+'">'+
+      '<span class="dot" style="background:'+EIX_CAT_COLOR[c]+'"></span>'+esc(eixCatLabel(c))+'</button>';
+  });
+
+  body.innerHTML=
+    '<div class="row" style="gap:8px;overflow-x:auto;padding:2px 2px 8px;flex-wrap:nowrap">'+
+      '<button class="chip on" data-toggle="names">'+esc(t('eixNames'))+'</button>'+
+      '<button class="chip on" data-toggle="diag">'+esc(t('eixDiag'))+'</button>'+
+      '<button class="chip on" data-toggle="poi">'+esc(t('eixPoi'))+'</button>'+
+      '<button class="chip" id="eix-barris">'+esc(t('eixBarris'))+'</button>'+
+    '</div>'+
+    '<div class="row" id="eix-catbar" style="gap:8px;overflow-x:auto;padding:0 2px 10px;flex-wrap:nowrap">'+catBar+'</div>'+
+    '<div class="card" id="eix-stage" style="overflow:auto;height:60vh;padding:10px"></div>';
+  document.getElementById('eix-stage').appendChild(svg);
+
+  document.getElementById('eix-barris').onclick=function(){
+    eixDetail('<b style="display:block;margin-bottom:8px;font-size:1rem">'+esc(t('eixBarrisTitle'))+'</b>'+
+      D.barris.map(function(b){return '<span class="pill neutral" style="margin:3px 4px 0 0">'+esc(b)+'</span>';}).join(''));
+  };
+  body.querySelectorAll('[data-toggle]').forEach(function(chip){
+    chip.onclick=function(){
+      var key=chip.dataset.toggle, on=!chip.classList.contains('on');
+      chip.classList.toggle('on',on);
+      if(key==='names'){ Object.values(built.vLabels).concat(Object.values(built.hLabels)).forEach(function(l){ l.style.display=on?'':'none'; }); }
+      else if(key==='diag'){ built.diagGroup.style.display=on?'':'none'; }
+      else if(key==='poi'){ poiGroup.style.display=on?'':'none'; document.getElementById('eix-catbar').style.display=on?'flex':'none'; }
+    };
+  });
+  body.querySelectorAll('#eix-catbar [data-cat]').forEach(function(chip){
+    chip.onclick=function(){
+      var c=chip.dataset.cat; EIXVIEW.activeCats[c]=!EIXVIEW.activeCats[c];
+      var on=EIXVIEW.activeCats[c];
+      chip.classList.toggle('on',on);
+      chip.style.background=on?EIX_CAT_COLOR[c]:''; chip.style.borderColor=on?EIX_CAT_COLOR[c]:''; chip.style.color=on?'#1b1405':'';
+      poiGroup.querySelectorAll('[data-cat="'+c+'"]').forEach(function(n){ n.style.display=on?'':'none'; });
+    };
+  });
+  svg.addEventListener('click',function(e){ if(e.target===svg) clearHi(); });
+}
+function eixRenderLesson(body, verticals){
+  var CHUNK=6;
+  var chunks=[]; for(var i=0;i<verticals.length;i+=CHUNK) chunks.push(verticals.slice(i,i+CHUNK));
+  if(EIXVIEW.lessonIdx===undefined) EIXVIEW.lessonIdx=0;
+  var idx=EIXVIEW.lessonIdx;
+  var htm='<p class="tiny muted" style="margin-bottom:12px">'+esc(t('eixLessonIntro'))+' '+esc(t('eixBlock'))+' '+(idx+1)+' '+esc(t('eixOf'))+' '+chunks.length+'.</p>';
+  chunks.forEach(function(chunk,ci){
+    if(ci>idx) return;
+    htm+='<div class="card pad" style="margin-bottom:10px"><b class="tiny muted" style="text-transform:uppercase;letter-spacing:.04em">'+esc(t('eixBlock'))+' '+(ci+1)+'</b><div style="margin-top:8px">'+
+      chunk.map(function(v){return '<span class="pill neutral" style="margin:3px 4px 0 0;font-size:.84rem;padding:6px 11px">'+esc(v.name)+'</span>';}).join('')+'</div></div>';
+  });
+  if(idx<chunks.length-1){
+    htm+='<button class="btn primary" id="eix-next">'+esc(t('eixGotIt'))+'</button>';
+  } else {
+    htm+='<div class="card pad" style="margin-bottom:10px">'+esc(t('eixLessonDone'))+'</div>'+
+      '<button class="btn" id="eix-restart">'+esc(t('eixRestart'))+'</button>';
+  }
+  body.innerHTML=htm;
+  var nx=document.getElementById('eix-next'); if(nx) nx.onclick=function(){ EIXVIEW.lessonIdx++; eixRenderLesson(body,verticals); };
+  var rs=document.getElementById('eix-restart'); if(rs) rs.onclick=function(){ EIXVIEW.lessonIdx=0; eixRenderLesson(body,verticals); };
+}
+function eixRenderQuiz(body, verticals){
+  body.innerHTML=
+    '<div id="eix-quizmap" class="card" style="overflow:auto;padding:10px;margin-bottom:14px"></div>'+
+    '<div class="center" style="font-weight:700;margin-bottom:6px" id="eix-qtext"></div>'+
+    '<div class="tiny muted center" style="margin-bottom:12px" id="eix-score"></div>'+
+    '<div class="stack" style="gap:8px" id="eix-opts"></div>';
+  var mapEl=document.getElementById('eix-quizmap');
+  var built=eixBuildSvg(verticals, verticals.length? window.EIXAMPLE.horizontals:[], window.EIXAMPLE);
+  var scale=Math.min(1, (Math.min(window.innerWidth,480)-32)/built.gridW);
+  built.svg.setAttribute('width', Math.round(built.gridW*scale));
+  built.svg.setAttribute('height', Math.round(built.gridH*scale));
+  mapEl.appendChild(built.svg);
+
+  function scoreline(){ return t('eixStreak')+': '+EIXVIEW.quizStreak+' · '+t('eixAsked')+': '+EIXVIEW.quizTotal; }
+  document.getElementById('eix-score').textContent=scoreline();
+
+  function newQuestion(){
+    var opts=document.getElementById('eix-opts'); opts.innerHTML='';
+    Object.values(built.vLines).forEach(function(l){ l.classList.remove('hi'); });
+    var target=verticals[Math.floor(Math.random()*verticals.length)];
+    built.vLines[target.id].classList.add('hi');
+    document.getElementById('eix-qtext').textContent=t('eixQ');
+    var pool=verticals.filter(function(v){return v.id!==target.id;});
+    var wrongs=[]; while(wrongs.length<3 && pool.length){ var i2=Math.floor(Math.random()*pool.length); wrongs.push(pool.splice(i2,1)[0]); }
+    var choices=wrongs.concat([target]).sort(function(){return Math.random()-.5;});
+    choices.forEach(function(c){
+      var b=document.createElement('button'); b.className='btn sm'; b.style.width='100%'; b.textContent=c.name;
+      b.onclick=function(){
+        EIXVIEW.quizTotal++;
+        if(c.id===target.id){ b.style.background='var(--ok)'; b.style.borderColor='var(--ok)'; b.style.color='#04241a'; EIXVIEW.quizStreak++; }
+        else { b.style.background='var(--ko)'; b.style.borderColor='var(--ko)'; b.style.color='#2a0509'; EIXVIEW.quizStreak=0;
+          Array.from(opts.children).forEach(function(o){ if(o.textContent===target.name){ o.style.background='var(--ok)'; o.style.borderColor='var(--ok)'; o.style.color='#04241a'; } });
+        }
+        document.getElementById('eix-score').textContent=scoreline();
+        Array.from(opts.children).forEach(function(o){ o.disabled=true; });
+        setTimeout(newQuestion,900);
+      };
+      opts.appendChild(b);
+    });
+  }
+  newQuestion();
 }
 
 /* ---------------- SETTINGS ---------------- */

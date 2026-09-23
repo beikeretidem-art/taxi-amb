@@ -7,6 +7,8 @@ App web offline para estudiar el manual de la Credencial del Taxi del AMB 2026. 
 - `src/styles.css`: estilos; tokens de color en `:root`, con modo oscuro.
 - `src/data/_head.js`: define `q(m, s, qCA, qES, opcionesCA, opcionesES, correcta, explicacionCA, explicacionES, referencia, flag)`.
 - `src/data/d*.js`: el banco de preguntas por módulo (tar, reg, pro, eix, via, amb, cat, cst).
+- `src/eixample_map.js`: datos del mòdul "Mapa Eixample" (prova pilot, `viewEixMap()` en app.js) — carrers, places, barris i punts d'interès amb adreça real (fets, no redacció del manual). No confondre amb `src/data/`.
+- `lab/`: prototips locals de treball, **no es puja al repositori** (està a `.gitignore`).
 - `icon/`: icono de la app (SVG + PNG 180/192/512).
 - `build.py`: genera `docs/` (web para GitHub Pages) y `dist/credencial-taxi-amb.html` (un único HTML).
 - `docs/`: **generado, no editar a mano**. Se sube al repo porque GitHub Pages lo sirve.

@@ -16,7 +16,7 @@ if (!process.argv[2]) {
     let f = path.join(root, decodeURIComponent(req.url.split('?')[0]));
     if (f.endsWith(path.sep)) f += 'index.html';
     fs.readFile(f, (e, d) => { if (e) { res.writeHead(404); return res.end('no'); } res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); res.end(d); });
-  }).listen(8123);
+  }).listen(8123, '127.0.0.1');
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -115,6 +115,16 @@ async function open(ctx, tag) { const p = await ctx.newPage(); watch(p, tag); aw
   await p.locator('#b-set').click(); await p.waitForSelector('#s-local');
   const setEs = await p.locator('#s-local').innerText();
   ok('Ajustes (ES): aviso almacenamiento local', /solo en este dispositivo/.test(setEs) && /borras los datos/.test(setEs) && /Exportar/.test(setEs));
+  const legalEs = await p.locator('#s-legal').innerText();
+  ok('Ajustes (ES): aviso legal (no oficial + IA)', /no es un producto ni un servicio oficial/i.test(legalEs) && /Incrementa/.test(legalEs) && /IA/.test(legalEs));
+  await p.locator('#s-close').click();
+  await p.locator('.lang button[data-l="ca"]').click();
+  await p.locator('#b-set').click(); await p.waitForSelector('#s-legal');
+  const legalCa = await p.locator('#s-legal').innerText();
+  ok('Ajustes (CA): aviso legal (no oficial + IA)', /no és un producte ni un servei oficial/i.test(legalCa) && /Incrementa/.test(legalCa) && /IA/.test(legalCa));
+  await p.locator('#s-close').click();
+  await p.locator('.lang button[data-l="es"]').click();
+  await p.locator('#b-set').click(); await p.waitForSelector('#s-local');
   const [dl] = await Promise.all([p.waitForEvent('download'), p.locator('#s-exp').click()]);
   ok('exportar: descarga normal del navegador', /progres-taxi-amb-.*\.json$/.test(dl.suggestedFilename()), dl.suggestedFilename());
   const exported = JSON.parse(require('fs').readFileSync(await dl.path(), 'utf8'));

@@ -216,7 +216,9 @@ var T = {
   errImport:{ca:'Fitxer no vàlid',es:'Archivo no válido'},
   bank:{ca:'Banc de preguntes',es:'Banco de preguntas'},
   about:{ca:'Sobre l’app',es:'Sobre la app'},
-  aboutT:{ca:'Preguntes elaborades a partir del manual del Curs Online Credencial del Taxi 2026 (Escola del Taxi Incrementa), el Reglament Metropolità del Taxi i les tarifes 2026. Funciona sense connexió.',es:'Preguntas elaboradas a partir del manual del Curso Online Credencial del Taxi 2026 (Escola del Taxi Incrementa), el Reglamento Metropolitano del Taxi y las tarifas 2026. Funciona sin conexión.'},
+  aboutT:{ca:'Preguntes elaborades amb ajuda d’IA a partir del manual del Curs Online Credencial del Taxi 2026 (Escola del Taxi Incrementa), el Reglament Metropolità del Taxi i les tarifes 2026. Funciona sense connexió.',es:'Preguntas elaboradas con ayuda de IA a partir del manual del Curso Online Credencial del Taxi 2026 (Escola del Taxi Incrementa), el Reglamento Metropolitano del Taxi y las tarifas 2026. Funciona sin conexión.'},
+  legal:{ca:'Avís legal',es:'Aviso legal'},
+  legalT:{ca:'Aquesta és una app personal, sense ànim de lucre, feta per estudiar. No és un producte ni un servei oficial, i no té cap relació amb l’AMB, l’Institut Metropolità del Taxi ni l’Escola del Taxi Incrementa, ni compta amb el seu vistiplau. El contingut s’ha elaborat amb ajuda d’eines d’IA a partir de material d’estudi, amb l’única intenció d’ajudar a estudiar i sense voluntat de perjudicar ningú. Si ets titular dels drets d’algun contingut i vols que es corregeixi o es retiri, obre una incidència al repositori de GitHub del projecte.',es:'Esta es una app personal, sin ánimo de lucro, hecha para estudiar. No es un producto ni un servicio oficial, y no tiene relación alguna con el AMB, el Instituto Metropolitano del Taxi ni la Escola del Taxi Incrementa, ni cuenta con su visto bueno. El contenido se ha elaborado con ayuda de herramientas de IA a partir de material de estudio, con la única intención de ayudar a estudiar y sin voluntad de perjudicar a nadie. Si eres titular de los derechos de algún contenido y quieres que se corrija o se retire, abre una incidencia en el repositorio de GitHub del proyecto.'},
   expires:{ca:'Dada que caduca (tarifes/calendari 2026)',es:'Dato que caduca (tarifas/calendario 2026)'},
   timeLeft:{ca:'Temps',es:'Tiempo'},
   quit:{ca:'Abandonar',es:'Abandonar'},
@@ -1152,6 +1154,8 @@ function openSettings(){
       '<div class="card pad"><div class="small" style="font-weight:650;margin-bottom:4px">'+esc(t('bank'))+'</div>'+
         '<div class="tiny muted">'+DB.length+' '+esc(S.lang==='ca'?'preguntes · català i castellà':'preguntas · catalán y castellano')+'</div>'+
         '<div class="tiny muted" style="margin-top:8px">'+esc(t('aboutT'))+'</div></div>'+
+      '<div class="card pad" id="s-legal"><div class="small" style="font-weight:650;margin-bottom:4px">'+esc(t('legal'))+'</div>'+
+        '<div class="tiny muted">'+esc(t('legalT'))+'</div></div>'+
       '<div class="card pad" id="s-local"><div class="small" style="font-weight:650;margin-bottom:4px">'+esc(t('localOnly'))+'</div>'+
         '<div class="tiny muted">'+esc(t('localWarn'))+'</div></div>'+
       '<button class="btn danger" id="s-reset">'+esc(t('reset'))+'</button>'+

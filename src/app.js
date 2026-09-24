@@ -288,7 +288,12 @@ var T = {
   catEdifici:{ca:'Edificis',es:'Edificios'},
   catParc:{ca:'Parcs',es:'Parques'},
   catTransport:{ca:'Transport',es:'Transporte'},
-  catMercat:{ca:'Mercats',es:'Mercados'}
+  catMercat:{ca:'Mercats',es:'Mercados'},
+  eixItin:{ca:'Itineraris',es:'Itinerarios'},
+  eixItinQExit:{ca:'Vols anar a %n. Quina sortida de la Ronda %r agafaries?',es:'Quieres ir a %n. ¿Qué salida de la Ronda %r cogerías?'},
+  eixItinQRoad:{ca:'Circulant per la %c, a quina d’aquestes poblacions arribaries?',es:'Circulando por la %c, ¿a cuál de estas poblaciones llegarías?'},
+  eixItinExit:{ca:'Sortida',es:'Salida'},
+  eixItinIntro:{ca:'Preguntes sobre les sortides de les Rondes B-10/B-20 i les carreteres de sortida de Barcelona, amb els municipis reals que connecten.',es:'Preguntas sobre las salidas de las Rondas B-10/B-20 y las carreteras de salida de Barcelona, con los municipios reales que conectan.'}
 };
 function t(k,r){var s=(T[k]&&T[k][S.lang])||k; if(r){for(var p in r){s=s.split(p).join(r[p]);}} return s;}
 function L(o){ return o? (o[S.lang]||o.ca||o.es||'') : ''; }
@@ -1198,7 +1203,8 @@ function viewEixMap(){
     '<p class="tiny muted">'+esc(t('beta'))+' · '+esc(t('eixMapD'))+'</p></div>'+
     '<div class="tabs"><button data-eixmode="explore" class="'+(EIXVIEW.mode==='explore'?'on':'')+'">'+esc(t('eixExplore'))+'</button>'+
     '<button data-eixmode="lesson" class="'+(EIXVIEW.mode==='lesson'?'on':'')+'">'+esc(t('eixLesson'))+'</button>'+
-    '<button data-eixmode="quiz" class="'+(EIXVIEW.mode==='quiz'?'on':'')+'">'+esc(t('eixTest'))+'</button></div>'+
+    '<button data-eixmode="quiz" class="'+(EIXVIEW.mode==='quiz'?'on':'')+'">'+esc(t('eixTest'))+'</button>'+
+    '<button data-eixmode="itin" class="'+(EIXVIEW.mode==='itin'?'on':'')+'">'+esc(t('eixItin'))+'</button></div>'+
     '<div id="eix-body"></div>'+
   '</div>';
   app.innerHTML=html;
@@ -1209,6 +1215,7 @@ function viewEixMap(){
   var body=document.getElementById('eix-body');
   if(EIXVIEW.mode==='lesson'){ eixRenderLesson(body, verticals); return; }
   if(EIXVIEW.mode==='quiz'){ eixRenderQuiz(body, verticals); return; }
+  if(EIXVIEW.mode==='itin'){ eixRenderItin(body); return; }
   eixRenderExplore(body, D, verticals, horizontals, POIS);
 }
 function eixBuildSvg(verticals, horizontals, D){
@@ -1399,6 +1406,65 @@ function eixRenderQuiz(body, verticals){
       };
       opts.appendChild(b);
     });
+  }
+  newQuestion();
+}
+function eixRenderItin(body){
+  var EXITS=window.EIX_EXITS||[], ROADS=window.EIX_CARRETERES||[];
+  body.innerHTML=
+    '<p class="tiny muted" style="margin-bottom:14px">'+esc(t('eixItinIntro'))+'</p>'+
+    '<div class="center" style="font-weight:700;margin-bottom:6px" id="eix-qtext"></div>'+
+    '<div class="tiny muted center" style="margin-bottom:12px" id="eix-score"></div>'+
+    '<div class="stack" style="gap:8px" id="eix-opts"></div>';
+  function scoreline(){ return t('eixStreak')+': '+EIXVIEW.quizStreak+' · '+t('eixAsked')+': '+EIXVIEW.quizTotal; }
+  document.getElementById('eix-score').textContent=scoreline();
+
+  function answer(btn, ok, correctText, opts){
+    EIXVIEW.quizTotal++;
+    if(ok){ btn.style.background='var(--ok)'; btn.style.borderColor='var(--ok)'; btn.style.color='#04241a'; EIXVIEW.quizStreak++; }
+    else { btn.style.background='var(--ko)'; btn.style.borderColor='var(--ko)'; btn.style.color='#2a0509'; EIXVIEW.quizStreak=0;
+      Array.from(opts.children).forEach(function(o){ if(o.textContent===correctText){ o.style.background='var(--ok)'; o.style.borderColor='var(--ok)'; o.style.color='#04241a'; } });
+    }
+    document.getElementById('eix-score').textContent=scoreline();
+    Array.from(opts.children).forEach(function(o){ o.disabled=true; });
+    setTimeout(newQuestion,900);
+  }
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t2=a[i]; a[i]=a[j]; a[j]=t2; } return a; }
+
+  function newQuestion(){
+    var opts=document.getElementById('eix-opts'); opts.innerHTML='';
+    var qtype = Math.random()<0.5 && EXITS.length ? 'exit' : 'road';
+    if(qtype==='exit'){
+      var named=EXITS.filter(function(e){return e.name;});
+      var target=named[Math.floor(Math.random()*named.length)];
+      document.getElementById('eix-qtext').textContent=t('eixItinQExit',{'%n':target.name,'%r':target.ronda});
+      var pool=EXITS.filter(function(e){return e.n!==target.n;});
+      var wrongs=shuffle(pool).slice(0,3);
+      var choices=shuffle(wrongs.concat([target]));
+      choices.forEach(function(c){
+        var b=document.createElement('button'); b.className='btn sm'; b.style.width='100%';
+        b.textContent=t('eixItinExit')+' '+c.n+' ('+c.ronda+')';
+        b.onclick=function(){ answer(b, c.n===target.n, t('eixItinExit')+' '+target.n+' ('+target.ronda+')', opts); };
+        opts.appendChild(b);
+      });
+    } else {
+      var road=ROADS[Math.floor(Math.random()*ROADS.length)];
+      var correctCity=road.municipis[Math.floor(Math.random()*road.municipis.length)];
+      document.getElementById('eix-qtext').textContent=t('eixItinQRoad',{'%c':road.code});
+      var others=ROADS.filter(function(r){return r.code!==road.code;});
+      var wrongCities=[];
+      shuffle(others).forEach(function(r){
+        if(wrongCities.length>=3) return;
+        var candidate=r.municipis[Math.floor(Math.random()*r.municipis.length)];
+        if(road.municipis.indexOf(candidate)===-1 && wrongCities.indexOf(candidate)===-1) wrongCities.push(candidate);
+      });
+      var cityChoices=shuffle(wrongCities.concat([correctCity]));
+      cityChoices.forEach(function(city){
+        var b=document.createElement('button'); b.className='btn sm'; b.style.width='100%'; b.textContent=city;
+        b.onclick=function(){ answer(b, city===correctCity, correctCity, opts); };
+        opts.appendChild(b);
+      });
+    }
   }
   newQuestion();
 }

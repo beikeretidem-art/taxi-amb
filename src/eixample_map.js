@@ -79,6 +79,57 @@ window.EIXAMPLE = {
   ],
 };
 
+/* Sortides de les Rondes B-20 (Ronda de Dalt) i B-10 (Ronda de Litoral).
+ * Fets (números de sortida i què hi ha a cada una): manual pàg. 151. */
+window.EIX_EXITS = [
+  { n:1, ronda:'B-20', name:'Trinitat', info:'Sector Maquinista, Meridiana, enllaç C-17' },
+  { n:2, ronda:'B-20', name:'Roquetes', info:'Via Júlia' },
+  { n:3, ronda:'B-20', name:'Guineueta', info:'Pl. Karl Marx, Pg. Valldaura' },
+  { n:4, ronda:'B-20', name:'Horta', info:'Túnel de la Rovira, Parc del Laberint, Velòdrom, Cementiri' },
+  { n:5, ronda:'B-20', name:'Vall d’Hebron', info:'Ciutat Sanitària, Hospital Sant Rafael, Cementiri St. Genís' },
+  { n:6, ronda:'B-20', name:'Vallcarca', info:'Pl. Lesseps, Hospital Quirón, Pl. Alfons Comín' },
+  { n:7, ronda:'B-20', name:'Sant Gervasi', info:'Via Augusta, Bonanova, Cementiri/Tanatori St. Gervasi' },
+  { n:8, ronda:'B-20', info:'Túnels de Vallvidrera (només sentit Llobregat), enllaç C-16' },
+  { n:9, ronda:'B-20', name:'Sarrià', info:'Can Carelleu, Av. Josep Vicenç Foix' },
+  { n:10, ronda:'B-20', name:'Pedralbes', info:'Crta. d’Esplugues, Hospital Sant Joan de Déu, Zona Universitària' },
+  { n:11, ronda:'B-20', name:'Diagonal', info:'Zona Universitària, Camp Nou, Av. Diagonal, Palau de Congressos' },
+  { n:12, ronda:'B-20', name:'Esplugues', info:'Crta. de Collblanc, Pubilla Casas, Hospital General de l’Hospitalet' },
+  { n:13, ronda:'B-20', name:'Av. Electricitat', info:'Can Serra, Can Vidalet, límit Esplugues-Hospitalet' },
+  { n:14, ronda:'B-20', name:'Cornellà', info:'Barri St. Ildefons, límit Cornellà i Hospitalet' },
+  { n:15, ronda:'B-20', name:'Hospitalet', info:'Av. Carrilet, Polígon Almeda, RCD Espanyol' },
+  { n:16, ronda:'B-10', name:'Nus de Llobregat', info:'Enllaç A-2, C-32 i Ronda de Dalt' },
+  { n:17, ronda:'B-10', name:'Bellvitge', info:'Zona Franca, enllaç C-31, Hospital de Bellvitge' },
+  { n:18, ronda:'B-10', name:'Zona Franca', info:'Port, Pg. Zona Franca, IMT' },
+  { n:19, ronda:'B-10', name:'Montjuïc', info:'Anella Olímpica, cementiri del Sud-Oest, Can Tunis' },
+  { n:20, ronda:'B-10', info:'Port-Mercaderies (només sentit Llobregat), Morrot, Moll Adossat' },
+  { n:21, ronda:'B-10', name:'Ciutat Vella', info:'Paral·lel, La Rambla, Port Vell, Pl. Drassanes' },
+  { n:22, ronda:'B-10', name:'Barceloneta', info:'Port Olímpic, Hospital del Mar, Hotel W, Hotel Arts' },
+  { n:23, ronda:'B-10', name:'Poblenou', info:'Bac de Roda, cementiri de l’Est' },
+  { n:24, ronda:'B-10', name:'Besòs-Diagonal Mar', info:'Rbla. Prim, Pl. Llevant, Edifici Fòrum, CC Diagonal Mar, Hilton' },
+  { n:25, ronda:'B-10', name:'Port Fòrum', info:'Port Esportiu, planta incineradora del Besòs' },
+  { n:26, ronda:'B-10', name:'Sant Adrià', info:'La Mina, Sant Adrià del Besòs' },
+  { n:27, ronda:'B-10', name:'Badalona', info:'Enllaç C-31 direcció Montgat' },
+  { n:28, ronda:'B-10', info:'Gran Via (només sentit Llobregat), Pl. Glòries' },
+  { n:29, ronda:'B-10', info:'Verneda (només sentit Llobregat), Rambla Guipúscoa, Bon Pastor' },
+  { n:30, ronda:'B-10', name:'Bon Pastor', info:'Santa Coloma de Gramenet, Pg. Potosí, Sector Maquinista' },
+];
+
+/* Carreteres de sortida i municipis que connecten. Fets (xifra de carretera
+ * i municipis reals), no la redacció del manual. Zona Besòs: pàg. 148. */
+window.EIX_CARRETERES = [
+  { code:'C-58', desc:'Nus de la Trinitat → Terrassa / Manresa', municipis:['Montcada i Reixac','Ripollet','Cerdanyola del Vallès','Badia del Vallès','Sabadell','Terrassa'] },
+  { code:'C-33', desc:'Nus de la Trinitat → AP-7 (Girona)', municipis:['Mollet del Vallès','Parets del Vallès'] },
+  { code:'B-20 (Pota Nord)', desc:'Prolongació de la Ronda de Dalt des del Nus de la Trinitat', municipis:['Santa Coloma de Gramenet','Badalona','Tiana','Montgat'] },
+  { code:'C-32 (Maresme)', desc:'Comença a Montgat, direcció Girona', municipis:['Montgat','Badalona'] },
+  { code:'C-17', desc:'Neix a l’Av. Meridiana, direcció Vic / Puigcerdà', municipis:['Montcada i Reixac','Mollet del Vallès'] },
+  { code:'C-31 (nord)', desc:'Surt per la Gran Via, direcció Mataró', municipis:['Sant Adrià de Besòs','Badalona','Montgat','Tiana'] },
+  { code:'N-150', desc:'Barcelona → Sabadell / Terrassa', municipis:['Montcada i Reixac','Cerdanyola del Vallès','Ripollet','Badia del Vallès','Barberà del Vallès','Sabadell','Terrassa'] },
+  { code:'N-II', desc:'Carretera de la costa cap a Mataró', municipis:['Badalona','Montgat'] },
+  { code:'B-23', desc:'Ronda de Dalt (sortida 10b) direcció Llobregat', municipis:['Esplugues de Llobregat','Sant Just Desvern','Sant Joan Despí','L’Hospitalet de Llobregat'] },
+  { code:'C-31 (sud)', desc:'Direcció Tarragona des de l’Hospitalet', municipis:['L’Hospitalet de Llobregat','El Prat de Llobregat','Sant Boi de Llobregat','Viladecans','Gavà','Castelldefels'] },
+  { code:'N-340', desc:'Trav. de les Corts → Ctra. Collblanc, direcció Tarragona', municipis:['L’Hospitalet de Llobregat','Esplugues de Llobregat','Sant Just Desvern','Sant Joan Despí','Sant Feliu de Llobregat','Molins de Rei','El Papiol'] },
+];
+
 window.EIXAMPLE_POIS = [
   { name: 'Sagrada Família', addr: 'Sardenya / Marina (Pl. Sagrada Família)', near: 'sardenya', cat: 'monument' },
   { name: 'Casa Amatller', addr: 'Pg. de Gràcia, 41', near: 'pggracia', cat: 'monument' },

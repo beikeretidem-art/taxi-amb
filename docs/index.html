@@ -11061,7 +11061,7 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
   var headerH=Math.min(150, Math.max(56, 16+maxVName*6.0)); /* prou alt perquè el nom més llarg no es talli (angle -72°) */
   svg.style.display='block'; svg.style.width='100%'; svg.style.height='100%'; svg.style.touchAction='none';
   var poiGroup=document.createElementNS('http://www.w3.org/2000/svg','g');
-  var poiSlot={};
+  var poiSlot={}, placements=[];
   POIS.forEach(function(p){
     var v=verticals.find(function(vv){return vv.id===p.near;});
     if(!v) return;
@@ -11073,6 +11073,20 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
     var key=v.id+'|'+hIdx;
     var slot=poiSlot[key]||0; poiSlot[key]=slot+1;
     if(slot>0){ x+=(slot%2===1? 1:-1)*Math.ceil(slot/2)*14; }
+    placements.push({p:p, x:x, y:y, slot:slot});
+  });
+  /* si el nom (en diagonal amunt-dreta) passaria molt a prop d'un altre punt — típic
+   * quan dos POI són a la mateixa columna en files consecutives — es capgira: el nom
+   * surt avall-esquerra i s'hi ancora per l'última lletra en lloc de la primera. */
+  placements.forEach(function(pl){
+    pl.flip=placements.some(function(other){
+      if(other===pl) return false;
+      var dx=other.x-pl.x, dy=other.y-pl.y;
+      return dy<-6 && dy>-46 && Math.abs(dx)<66;
+    });
+  });
+  placements.forEach(function(pl){
+    var p=pl.p, x=pl.x, y=pl.y, slot=pl.slot, flip=pl.flip;
     var visible=EIXVIEW.activeCats[p.cat]!==false;
     var ring=document.createElementNS('http://www.w3.org/2000/svg','circle');
     ring.setAttribute('cx',x); ring.setAttribute('cy',y); ring.setAttribute('r',6);
@@ -11083,8 +11097,9 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
     var lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
     /* si comparteix encreuament amb un altre punt, allunya una mica el nom perquè
      * no es solapin entre ells; en diagonal (com els noms de carrer) per estalviar espai */
-    var lx=x+6, ly=y+3+(slot%2===1? 9:0);
+    var lx=flip? x-6:x+6, ly=(flip? y-3:y+3)+(slot%2===1? 9:0);
     lbl.setAttribute('x',lx); lbl.setAttribute('y',ly);
+    lbl.setAttribute('text-anchor', flip?'end':'start');
     lbl.setAttribute('transform','rotate(-55 '+lx+' '+ly+')');
     lbl.setAttribute('class','eixpoi-label'); lbl.setAttribute('data-cat',p.cat);
     lbl.textContent=p.name;

@@ -251,6 +251,9 @@ main{padding:18px 0 80px}
 .eixline-h.hi{stroke:var(--acc);stroke-width:5}
 .eixlabel-v{fill:var(--fg2);font-size:10px;text-anchor:end}
 .eixlabel-v.hi{fill:var(--acc);font-weight:700}
+.eix-vlabel{position:absolute;bottom:8px;right:0;white-space:nowrap;font-size:11px;color:var(--fg2);
+  transform-origin:100% 100%;transform:rotate(-55deg);pointer-events:none}
+.eix-vlabel.hi{color:var(--acc);font-weight:700}
 .eixlabel-h{fill:var(--fg2);font-size:10px}
 .eixlabel-h.hi{fill:var(--acc);font-weight:700}
 .eixdiag{stroke:var(--acc2);stroke-width:1.4;stroke-dasharray:6 4;opacity:.5}
@@ -11019,8 +11022,7 @@ function eixBuildSvg(verticals, horizontals, D){
   var W=verticals.length, colW=36, padL=92;
   var maxHName=horizontals.reduce(function(m,hh){return Math.max(m,(hh.name||'').length);},0);
   var padR=30+maxHName*6.1; /* prou espai perquè els noms de carrers horitzontals no es tallin */
-  var maxVName=verticals.reduce(function(m,v){return Math.max(m,(v.name||'').length);},0);
-  var rowH=34, padT=30+maxVName*4.4, padB=26; /* prou espai perquè les etiquetes rotades no es tallin ni toquin la fila 0 */
+  var rowH=34, padT=30, padB=26;
   var gridW=padL+(W-1)*colW+padR, gridH=padT+(horizontals.length-1)*rowH+padB;
   function vx(order){ var i=verticals.findIndex(function(v){return v.order===order;}); return padL+i*colW; }
   var ns='http://www.w3.org/2000/svg';
@@ -11036,14 +11038,11 @@ function eixBuildSvg(verticals, horizontals, D){
     var lbl=el('text',{x:x1+6,y:y+3,class:'eixlabel-h','data-id':hh.id});
     lbl.textContent=hh.name; svg.appendChild(lbl); hLabels[hh.id]=lbl;
   });
-  var vLines={}, vLabels={};
+  var vLines={};
   verticals.forEach(function(v,i){
     var x=padL+i*colW;
     var line=el('line',{x1:x,y1:padT,x2:x,y2:padT+(horizontals.length-1)*rowH,class:'eixline-v','data-id':v.id});
     svg.appendChild(line); vLines[v.id]=line;
-    var lblY=padT-9;
-    var lbl=el('text',{x:x+4,y:lblY,class:'eixlabel-v',transform:'rotate(-55 '+(x+4)+' '+lblY+')','data-id':v.id});
-    lbl.textContent=v.name; svg.appendChild(lbl); vLabels[v.id]=lbl;
   });
   var diagSpecs=[0.06,0.16,0.30,0.50,0.68,0.20,0.62,0.80,0.90];
   var diagGroup=el('g',{'class':'eix-diaggroup'});
@@ -11053,7 +11052,7 @@ function eixBuildSvg(verticals, horizontals, D){
     diagGroup.appendChild(el('line',{x1:xTop-36,y1:padT-2,x2:xTop+36,y2:padT+(horizontals.length-1)*rowH+2,class:'eixdiag'}));
   });
   svg.appendChild(diagGroup);
-  return {svg:svg, vx:vx, vLines:vLines, vLabels:vLabels, hLines:hLines, hLabels:hLabels, diagGroup:diagGroup, gridW:gridW, gridH:gridH, rowH:rowH, padT:padT, horizontals:horizontals};
+  return {svg:svg, vx:vx, vLines:vLines, hLines:hLines, hLabels:hLabels, diagGroup:diagGroup, gridW:gridW, gridH:gridH, rowH:rowH, padT:padT, horizontals:horizontals};
 }
 function eixRenderExplore(body, D, verticals, horizontals, POIS){
   var built=eixBuildSvg(verticals, horizontals, D);
@@ -11071,7 +11070,7 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
     /* si dos punts cauen exactament al mateix encreuament, separa'ls una mica perquè no es tapin */
     var key=v.id+'|'+hIdx;
     var slot=poiSlot[key]||0; poiSlot[key]=slot+1;
-    if(slot>0){ x+=(slot%2===1? 1:-1)*Math.ceil(slot/2)*12; }
+    if(slot>0){ x+=(slot%2===1? 1:-1)*Math.ceil(slot/2)*14; }
     var visible=EIXVIEW.activeCats[p.cat]!==false;
     var ring=document.createElementNS('http://www.w3.org/2000/svg','circle');
     ring.setAttribute('cx',x); ring.setAttribute('cy',y); ring.setAttribute('r',6);
@@ -11080,13 +11079,9 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
     c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',4);
     c.setAttribute('class','eixpoi'); c.setAttribute('fill',EIX_CAT_COLOR[p.cat]||'#888'); c.setAttribute('data-cat',p.cat);
     var lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
-    if(hIdx===0){
-      /* fila 0: el nom a sota del punt, mai a la dreta — a dalt hi ha les etiquetes
-       * rotades dels carrers verticals i xocarien amb el text */
-      lbl.setAttribute('x',x); lbl.setAttribute('y',y+16); lbl.setAttribute('text-anchor','middle');
-    } else {
-      lbl.setAttribute('x',x+7); lbl.setAttribute('y',y+3);
-    }
+    /* si comparteix encreuament amb un altre punt, alterna una fila més avall
+     * perquè els noms no es solapin entre ells */
+    lbl.setAttribute('x',x+7); lbl.setAttribute('y', y+(slot%2===1? 15:3));
     lbl.setAttribute('class','eixpoi-label'); lbl.setAttribute('data-cat',p.cat);
     lbl.textContent=p.name;
     if(!visible){ ring.style.display='none'; c.style.display='none'; lbl.style.display='none'; }
@@ -11098,13 +11093,13 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
 
   function clearHi(){
     Object.values(built.vLines).forEach(function(l){l.classList.remove('hi');});
-    Object.values(built.vLabels).forEach(function(l){l.classList.remove('hi');});
+    Object.values(vLabels).forEach(function(l){l.classList.remove('hi');});
     Object.values(built.hLines).forEach(function(l){l.classList.remove('hi');});
     Object.values(built.hLabels).forEach(function(l){l.classList.remove('hi');});
   }
   verticals.forEach(function(v){
     built.vLines[v.id].addEventListener('click',function(){
-      clearHi(); built.vLines[v.id].classList.add('hi'); built.vLabels[v.id].classList.add('hi');
+      clearHi(); built.vLines[v.id].classList.add('hi'); vLabels[v.id].classList.add('hi');
       var pois=POIS.filter(function(p){return p.near===v.id;});
       eixDetail('<b style="display:block;margin-bottom:6px;font-size:1rem">'+esc(v.name)+'</b>'+
         (v.from? '<div>'+esc(t('eixFrom'))+' <b>'+esc(v.from)+'</b> '+esc(t('eixTo'))+' <b>'+esc(v.to||'?')+'</b></div>':'')+
@@ -11138,17 +11133,39 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
       '<button class="chip" id="eix-barris">'+esc(t('eixBarris'))+'</button>'+
     '</div>'+
     '<div class="row" id="eix-catbar" style="gap:8px;overflow-x:auto;padding:0 2px 10px;flex-wrap:nowrap">'+catBar+'</div>'+
-    '<div class="card" id="eix-stage" style="position:relative;overflow:hidden;height:60vh;padding:0;touch-action:none">'+
-      '<div style="position:absolute;right:10px;bottom:10px;z-index:2;display:flex;flex-direction:column;gap:6px">'+
-        '<button class="iconbtn" id="eix-zoomin" style="background:var(--bg2)">+</button>'+
-        '<button class="iconbtn" id="eix-zoomout" style="background:var(--bg2)">−</button>'+
-        '<button class="iconbtn" id="eix-zoomfit" style="background:var(--bg2);font-size:.7rem">'+esc(t('eixFit'))+'</button>'+
+    '<div class="card" id="eix-mapcard" style="overflow:hidden;padding:0">'+
+      '<div id="eix-header" style="position:relative;height:60px;border-bottom:1px solid var(--line);overflow:hidden"></div>'+
+      '<div id="eix-stage" style="position:relative;overflow:hidden;height:60vh;padding:0;touch-action:none">'+
+        '<div style="position:absolute;right:10px;bottom:10px;z-index:2;display:flex;flex-direction:column;gap:6px">'+
+          '<button class="iconbtn" id="eix-zoomin" style="background:var(--bg2)">+</button>'+
+          '<button class="iconbtn" id="eix-zoomout" style="background:var(--bg2)">−</button>'+
+          '<button class="iconbtn" id="eix-zoomfit" style="background:var(--bg2);font-size:.7rem">'+esc(t('eixFit'))+'</button>'+
+        '</div>'+
       '</div>'+
     '</div>';
   var stage=document.getElementById('eix-stage');
+  var headerEl=document.getElementById('eix-header');
   stage.appendChild(svg);
-  eixAttachPanZoom(svg, built.gridW, built.gridH, stage, function(ratio){
+  /* Capçalera dels noms verticals com a HTML normal (no SVG): així la mida del
+   * text és sempre fixa i llegible, independent del zoom del mapa — només cal
+   * recalcular la posició horitzontal de cada etiqueta a cada pan/zoom. */
+  var vLabels={};
+  verticals.forEach(function(v){
+    var d=document.createElement('div');
+    d.className='eix-vlabel'; d.textContent=v.name;
+    headerEl.appendChild(d); vLabels[v.id]=d;
+  });
+  var headerW=headerEl.getBoundingClientRect().width||300;
+  function layoutHeader(vx0, vw0){
+    headerW=headerEl.getBoundingClientRect().width||headerW;
+    verticals.forEach(function(v){
+      var px=(built.vx(v.order)-vx0)/vw0*headerW;
+      vLabels[v.id].style.right=(headerW-px)+'px';
+    });
+  }
+  eixAttachPanZoom(svg, built.gridW, built.gridH, stage, function(vx0, vw0, ratio){
     poiGroup.classList.toggle('eix-poi-zoomed', ratio<0.55);
+    layoutHeader(vx0, vw0);
   });
 
   document.getElementById('eix-barris').onclick=function(){
@@ -11159,7 +11176,7 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
     chip.onclick=function(){
       var key=chip.dataset.toggle, on=!chip.classList.contains('on');
       chip.classList.toggle('on',on);
-      if(key==='names'){ Object.values(built.vLabels).concat(Object.values(built.hLabels)).forEach(function(l){ l.style.display=on?'':'none'; }); }
+      if(key==='names'){ Object.values(vLabels).concat(Object.values(built.hLabels)).forEach(function(l){ l.style.display=on?'':'none'; }); }
       else if(key==='diag'){ built.diagGroup.style.display=on?'':'none'; }
       else if(key==='poi'){ poiGroup.style.display=on?'':'none'; }
     };
@@ -11180,7 +11197,7 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
 function eixAttachPanZoom(svg, gridW, gridH, container, onZoom){
   var vx=0, vy=0, vw=gridW, vh=gridH;
   var minVw=gridW*0.16, maxVw=gridW;
-  function apply(){ svg.setAttribute('viewBox', vx+' '+vy+' '+vw+' '+vh); if(onZoom) onZoom(vw/gridW); }
+  function apply(){ svg.setAttribute('viewBox', vx+' '+vy+' '+vw+' '+vh); if(onZoom) onZoom(vx, vw, vw/gridW); }
   function clamp(){
     if(vw<minVw) vw=minVw; if(vw>maxVw) vw=maxVw;
     var r=container.getBoundingClientRect();

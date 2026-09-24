@@ -9500,7 +9500,8 @@ var IC = {
   fire:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s5 4.5 5 9a5 5 0 0 1-10 0c0-1.3.4-2.4 1-3.3C8.6 9.4 9.8 10 9.8 10S9 7 12 2z"/><path d="M7.5 13A6.5 6.5 0 0 0 12 22a6.5 6.5 0 0 0 4.5-9"/></svg>',
   down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 12l5 5 5-5M4 21h16"/></svg>',
   up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V8M7 12l5-5 5 5M4 3h16"/></svg>',
-  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>'
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>',
+  calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18"/></svg>'
 };
 
 /* ---------------- exam structure ---------------- */
@@ -9764,6 +9765,52 @@ var T = {
   catParc:{ca:'Parcs',es:'Parques'},
   catTransport:{ca:'Transport',es:'Transporte'},
   catMercat:{ca:'Mercats',es:'Mercados'},
+  /* ---- pla d'estudi ---- */
+  planTitle:{ca:'El teu pla d’estudi',es:'Tu plan de estudio'},
+  planPromptT:{ca:'Vols un pla per aprovar en 4 setmanes?',es:'¿Quieres un plan para aprobar en 4 semanas?'},
+  planPromptD:{ca:'Digues quins dies pots estudiar i t’organitzem el temari.',es:'Dinos qué días puedes estudiar y te organizamos el temario.'},
+  planConfigure:{ca:'Configurar pla',es:'Configurar plan'},
+  planLater:{ca:'Ara no',es:'Ahora no'},
+  planWeek:{ca:'Setmana',es:'Semana'},
+  planOf:{ca:'de',es:'de'},
+  planReady:{ca:'preparat',es:'preparado'},
+  planOnTrack:{ca:'Vas al dia',es:'Vas al día'},
+  planAhead:{ca:'Vas per davant, molt bé',es:'Vas por delante, muy bien'},
+  planBehindLittle:{ca:'Una mica endarrerit, res greu',es:'Un poco atrasado, nada grave'},
+  planBehindLot:{ca:'Molt endarrerit — pots ajustar el pla',es:'Muy atrasado — puedes ajustar el plan'},
+  planTodayLong:{ca:'Avui toca sessió llarga',es:'Hoy toca sesión larga'},
+  planTodayShort:{ca:'Avui toca sessió curta',es:'Hoy toca sesión corta'},
+  planTodayNone:{ca:'Avui no tenies sessió',es:'Hoy no tenías sesión'},
+  planTodayNoneD:{ca:'Un repàs ràpid opcional evita que se t’oblidi',es:'Un repaso rápido opcional evita que se te olvide'},
+  planQuickReview:{ca:'Repàs ràpid (%n)',es:'Repaso rápido (%n)'},
+  planStartSession:{ca:'Començar sessió d’avui',es:'Empezar sesión de hoy'},
+  planEdit:{ca:'Ajustar el pla',es:'Ajustar el plan'},
+  planSetupTitle:{ca:'Configura el teu pla',es:'Configura tu plan'},
+  planSetupIntro:{ca:'Tria quantes setmanes tens fins a l’examen i quins dies pots estudiar. Toca cada dia per canviar-ne el tipus de sessió.',es:'Elige cuántas semanas tienes hasta el examen y qué días puedes estudiar. Toca cada día para cambiar el tipo de sesión.'},
+  planWeeksLabel:{ca:'Setmanes fins a l’examen',es:'Semanas hasta el examen'},
+  planDaysLabel:{ca:'Dies disponibles',es:'Días disponibles'},
+  planDayNone:{ca:'Sense sessió',es:'Sin sesión'},
+  planDayShort:{ca:'Curta',es:'Corta'},
+  planDayLong:{ca:'Llarga',es:'Larga'},
+  planLenLabel:{ca:'Mida de les sessions',es:'Tamaño de las sesiones'},
+  planShortLen:{ca:'Curta: %n preguntes',es:'Corta: %n preguntas'},
+  planLongLen:{ca:'Llarga: %n preguntes',es:'Larga: %n preguntas'},
+  planFeasible:{ca:'Amb aquesta disponibilitat cobriràs tot el temari a temps.',es:'Con esta disponibilidad cubrirás todo el temario a tiempo.'},
+  planNotFeasible:{ca:'Amb aquesta disponibilitat trigaràs unes %n setmanes a cobrir tot el temari, no %w.',es:'Con esta disponibilidad tardarás unas %n semanas en cubrir todo el temario, no %w.'},
+  planNoDays:{ca:'Marca almenys un dia per activar el pla.',es:'Marca al menos un día para activar el plan.'},
+  planSave:{ca:'Desar pla',es:'Guardar plan'},
+  planPause:{ca:'Pausar pla',es:'Pausar plan'},
+  planResume:{ca:'Reprendre pla',es:'Reanudar plan'},
+  planDelete:{ca:'Esborrar pla',es:'Borrar plan'},
+  planDeleteAsk:{ca:'Segur? S’esborrarà la configuració del teu pla d’estudi.',es:'¿Seguro? Se borrará la configuración de tu plan de estudio.'},
+  planCalendar:{ca:'Afegeix recordatoris al calendari',es:'Añade recordatorios al calendario'},
+  planCalendarD:{ca:'Descarrega un fitxer que pots afegir al calendari del mòbil perquè t’avisi als dies i l’hora que has triat.',es:'Descarga un archivo que puedes añadir al calendario del móvil para que te avise en los días y la hora que has elegido.'},
+  planCalendarTime:{ca:'Hora preferida',es:'Hora preferida'},
+  planCalendarDone:{ca:'Fitxer de calendari descarregat',es:'Archivo de calendario descargado'},
+  planNoNotifD:{ca:'Aquesta app no envia notificacions push (no té servidor ni compte). Aquest fitxer de calendari és la manera real de rebre un avís a l’hora exacta.',es:'Esta app no envía notificaciones push (no tiene servidor ni cuenta). Este archivo de calendario es la forma real de recibir un aviso a la hora exacta.'},
+  planStreakRisk:{ca:'La teva ratxa de %n dies està en joc avui',es:'Tu racha de %n días está en juego hoy'},
+  dayMon:{ca:'Dl',es:'Lu'}, dayTue:{ca:'Dt',es:'Ma'}, dayWed:{ca:'Dc',es:'Mi'}, dayThu:{ca:'Dj',es:'Ju'},
+  dayFri:{ca:'Dv',es:'Vi'}, daySat:{ca:'Ds',es:'Sa'}, daySun:{ca:'Dg',es:'Do'},
   eixItin:{ca:'Itineraris',es:'Itinerarios'},
   eixItinQExit:{ca:'Vols anar a %n. Quina sortida de la Ronda %r agafaries?',es:'Quieres ir a %n. ¿Qué salida de la Ronda %r cogerías?'},
   eixItinQRoad:{ca:'Circulant per la %c, a quina d’aquestes poblacions arribaries?',es:'Circulando por la %c, ¿a cuál de estas poblaciones llegarías?'},
@@ -9775,7 +9822,7 @@ function L(o){ return o? (o[S.lang]||o.ca||o.es||'') : ''; }
 
 /* ---------------- storage ---------------- */
 var KEY='taxiamb.v1';
-var S = {lang:'ca', theme:'auto', srs:true, len:15, p:{}, day:null, streak:0, hist:[], lastMock:null, lastLevel:null};
+var S = {lang:'ca', theme:'auto', srs:true, len:15, p:{}, day:null, streak:0, hist:[], lastMock:null, lastLevel:null, plan:null};
 
 var LOADED_SAVED=0;
 function applyState(o){ if(!o||typeof o!=='object') return; for(var k in o){ if(o[k]!==undefined) S[k]=o[k]; } }
@@ -9808,6 +9855,7 @@ function save(){
   try{ localStorage.setItem(KEY,js); }catch(e){}
   try{ localStorage.setItem(KEY+'.bak',js); }catch(e){}
   idbPut(js);
+  updateBadge();
 }
 /* IndexedDB mirror: second copy in case localStorage is cleared */
 var idbP=null, IDB_DB=null, IDB_PEND=null, IDB_HOLD=true, idbT=null;
@@ -9967,6 +10015,109 @@ function strongTopics(min){
   return out;
 }
 
+/* ---------------- pla d'estudi ---------------- */
+/* plan.days: {0..6: 'none'|'short'|'long'} — clau = Date.getDay() (0=diumenge) */
+var PLAN_DEFAULT_DAYS = {0:'none',1:'short',2:'none',3:'short',4:'none',5:'short',6:'long'};
+function planTotalRemaining(){
+  var rem=0;
+  DB.forEach(function(q){ var p=S.p[q.i]; var b=p?(p.b||0):0; rem+=Math.max(0,4-b); });
+  return rem;
+}
+function planCapacityPerWeek(plan){
+  plan=plan||S.plan; if(!plan) return 0;
+  var c=0; for(var d=0;d<7;d++){ var t=plan.days[d]; if(t==='short') c+=plan.shortLen; else if(t==='long') c+=plan.longLen; }
+  return c;
+}
+function planRealisticWeeks(plan){
+  var cap=planCapacityPerWeek(plan); if(!cap) return Infinity;
+  return Math.max(1,Math.ceil(planTotalRemaining()/cap));
+}
+function planDayType(dateObj, plan){ plan=plan||S.plan; if(!plan) return 'none'; return plan.days[dateObj.getDay()]||'none'; }
+function planLenFor(type){ var plan=S.plan; if(!plan) return S.len; return type==='long'?plan.longLen:(type==='short'?plan.shortLen:0); }
+function planWeeksElapsed(){
+  var plan=S.plan; if(!plan||!plan.startDay) return 0;
+  return Math.floor((Date.now()-plan.startDay)/(7*864e5));
+}
+/* preguntes que "tocaven" des de l'inici del pla fins avui, segons els dies triats */
+function planExpectedByNow(){
+  var plan=S.plan; if(!plan||!plan.startDay) return 0;
+  var start=new Date(plan.startDay); start.setHours(0,0,0,0);
+  var now=new Date(); now.setHours(0,0,0,0);
+  var exp=0, d=new Date(start), guard=0;
+  while(d<=now && guard<400){ var t=planDayType(d,plan); if(t==='short') exp+=plan.shortLen; else if(t==='long') exp+=plan.longLen; d.setDate(d.getDate()+1); guard++; }
+  return exp;
+}
+function planAnswersEver(){
+  var n=0; for(var i in S.p){ n+=(S.p[i].ok||0)+(S.p[i].ko||0); }
+  return n;
+}
+function planActualSinceStart(){
+  var plan=S.plan; if(!plan) return 0;
+  return Math.max(0, planAnswersEver()-(plan.baseline||0));
+}
+function planStatus(){
+  var exp=planExpectedByNow(), act=planActualSinceStart();
+  var diff=act-exp, capWeek=Math.max(1,planCapacityPerWeek());
+  var k = diff>=capWeek*0.3 ? 'ahead' : diff>=0 ? 'onTrack' : diff> -capWeek*0.5 ? 'behindLittle' : 'behindLot';
+  return {k:k, diff:diff};
+}
+function planQuickReviewPool(){
+  /* prioritza el que ja toca repassar; si no n'hi ha, alguna cosa vista fa temps */
+  var now=Date.now();
+  var due=DB.filter(function(q){ var p=S.p[q.i]; return p&&(p.ok||p.ko)&&p.due<=now; });
+  if(due.length) return due;
+  return DB.filter(function(q){ return seen(q); });
+}
+function pad2(n){ return (n<10?'0':'')+n; }
+function planICS(){
+  var plan=S.plan; if(!plan) return;
+  var time=(plan.time||'20:00').split(':');
+  var hh=parseInt(time[0],10)||20, mm=parseInt(time[1],10)||0;
+  var DOWCODE=['SU','MO','TU','WE','TH','FR','SA'];
+  var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Credencial Taxi AMB//Pla d\'estudi//CA','CALSCALE:GREGORIAN'];
+  var today=new Date();
+  var until=new Date(plan.startDay||Date.now()); until.setDate(until.getDate()+plan.weeks*7);
+  var untilStr=until.getFullYear()+pad2(until.getMonth()+1)+pad2(until.getDate())+'T235900Z';
+  var any=false;
+  for(var d=0; d<7; d++){
+    var type=plan.days[d]; if(!type||type==='none') continue;
+    any=true;
+    var dt=new Date(today);
+    var diff=(d-dt.getDay()+7)%7;
+    dt.setDate(dt.getDate()+diff);
+    var dtstr=dt.getFullYear()+pad2(dt.getMonth()+1)+pad2(dt.getDate())+'T'+pad2(hh)+pad2(mm)+'00';
+    var summary=(type==='long'?t('planTodayLong'):t('planTodayShort'))+' — '+t('appName');
+    var descr=type==='long'? t('planLongLen',{'%n':plan.longLen}) : t('planShortLen',{'%n':plan.shortLen});
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:taxiamb-plan-'+d+'-'+Date.now()+'@taxiamb.github.io');
+    lines.push('DTSTAMP:'+dtstr);
+    lines.push('DTSTART:'+dtstr);
+    lines.push('DURATION:PT30M');
+    lines.push('RRULE:FREQ=WEEKLY;BYDAY='+DOWCODE[d]+';UNTIL='+untilStr);
+    lines.push('SUMMARY:'+summary);
+    lines.push('DESCRIPTION:'+descr);
+    lines.push('END:VEVENT');
+  }
+  lines.push('END:VCALENDAR');
+  if(!any) return;
+  try{
+    var blob=new Blob([lines.join('\r\n')],{type:'text/calendar'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='pla-estudi-taxi-amb.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},1500);
+    toast(t('planCalendarDone'));
+  }catch(e){}
+}
+function updateBadge(){
+  try{
+    if(!('setAppBadge' in navigator)) return;
+    var due=dueCount();
+    if(due>0) navigator.setAppBadge(due).catch(function(){});
+    else if('clearAppBadge' in navigator) navigator.clearAppBadge().catch(function(){});
+  }catch(e){}
+}
+
 /* ---------------- dom helpers ---------------- */
 var app, topEl;
 function h(html){ var d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstElementChild; }
@@ -9998,6 +10149,7 @@ function render(){
   else if(v==='mockIntro') viewIntro('mock');
   else if(v==='errors') viewErrors();
   else if(v==='eixmap') viewEixMap();
+  else if(v==='planSetup') viewPlanSetup();
   else viewHome();
 }
 
@@ -10050,6 +10202,7 @@ function viewHome(){
     '</div></div>';
 
   html+=installTip();
+  html+=planCard();
 
   /* paused session */
   var cur=S.cur;
@@ -10116,6 +10269,19 @@ function viewHome(){
   app.querySelectorAll('[data-mod]').forEach(function(el){
     el.onclick=function(){ go('cat',el.dataset.mod); };
   });
+  var pc=document.getElementById('plan-configure'); if(pc) pc.onclick=function(){ go('planSetup'); };
+  var pl=document.getElementById('plan-later'); if(pl) pl.onclick=function(){ S.planPromptDismissed=true; save(); render(); };
+  var pe=document.getElementById('plan-edit'); if(pe) pe.onclick=function(){ go('planSetup'); };
+  var pg=document.getElementById('plan-go'); if(pg) pg.onclick=function(){
+    var type=planDayType(new Date());
+    var len=planLenFor(type);
+    startSession({mode:'plan', pool:DB, n:len, title:t('planTitle')});
+  };
+  var pq=document.getElementById('plan-quick'); if(pq) pq.onclick=function(){
+    var pool=planQuickReviewPool();
+    var n=Math.min(8,pool.length||8);
+    startSession({mode:'plan', pool:pool.length?pool:DB, n:n, title:t('planQuickReview',{'%n':n})});
+  };
 }
 function tile(id,icon,title,sub){
   return '<button class="btn-tile" id="'+id+'"><div class="ic">'+icon+'</div>'+
@@ -10133,6 +10299,49 @@ function modCard(m){
     '<div class="mod-meta"><span>'+esc(st.rate===null? t('seen',{'%a':st.seen,'%b':st.pool}) : t('hitRate',{'%n':st.rate}))+'</span>'+
     '<span>'+esc(t('maxErrors',{'%n':m.maxErr}))+'</span></div>'+
   '</button>';
+}
+
+function planCard(){
+  if(!S.plan){
+    if(S.planPromptDismissed) return '';
+    return '<div class="card pad">'+
+      '<div class="row" style="gap:10px;align-items:flex-start">'+
+        '<div class="ic" style="width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--bg3);flex:none">'+IC.calendar+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<b style="display:block;margin-bottom:2px">'+esc(t('planPromptT'))+'</b>'+
+          '<div class="tiny muted">'+esc(t('planPromptD'))+'</div>'+
+        '</div></div>'+
+      '<div class="row" style="gap:8px;margin-top:12px;align-items:stretch">'+
+        '<button class="btn primary" id="plan-configure" style="flex:1">'+esc(t('planConfigure'))+'</button>'+
+        '<button class="btn ghost" id="plan-later" style="flex:0 0 auto;width:auto;padding:0 16px;min-height:0">'+esc(t('planLater'))+'</button>'+
+      '</div></div>';
+  }
+  if(!S.plan.active) return '';
+  var wk=Math.min(planWeeksElapsed()+1, 99);
+  var st=planStatus();
+  var statusKey = st.k==='ahead'?'planAhead' : st.k==='onTrack'?'planOnTrack' : st.k==='behindLittle'?'planBehindLittle':'planBehindLot';
+  var statusColor = st.k==='ahead'?'var(--ok)' : st.k==='onTrack'?'var(--ok)' : st.k==='behindLittle'?'var(--acc)':'var(--ko)';
+  var type=planDayType(new Date());
+  var todayLine, todayBtn;
+  if(type==='none'){
+    todayLine='<b>'+esc(t('planTodayNone'))+'</b><div class="tiny muted">'+esc(t('planTodayNoneD'))+'</div>';
+    var qpool=planQuickReviewPool();
+    todayBtn='<button class="btn" id="plan-quick" style="flex:1">'+IC.flip+'<span>'+esc(t('planQuickReview',{'%n':Math.min(8,qpool.length||8)}))+'</span></button>';
+  } else {
+    todayLine='<b>'+esc(type==='long'? t('planTodayLong'):t('planTodayShort'))+'</b><div class="tiny muted">'+esc((type==='long'?t('planLongLen',{'%n':S.plan.longLen}):t('planShortLen',{'%n':S.plan.shortLen})))+'</div>';
+    todayBtn='<button class="btn primary" id="plan-go" style="flex:1">'+IC.play+'<span>'+esc(t('planStartSession'))+'</span></button>';
+  }
+  return '<div class="card pad">'+
+    '<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">'+
+      '<div class="row" style="gap:6px"><span class="ic" style="width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--bg3)">'+IC.calendar+'</span>'+
+      '<b>'+esc(t('planWeek'))+' '+wk+' '+esc(t('planOf'))+' '+S.plan.weeks+'</b></div>'+
+      (S.streak>1?'<span class="row" style="gap:4px;font-weight:700;color:var(--acc)">'+IC.fire.replace('<svg','<svg style="width:13px;height:13px"')+S.streak+'</span>':'')+
+    '</div>'+
+    '<div class="tiny" style="color:'+statusColor+';font-weight:650;margin-bottom:10px">'+esc(t(statusKey))+'</div>'+
+    '<div style="margin-bottom:10px">'+todayLine+'</div>'+
+    '<div class="row" style="gap:8px;align-items:stretch">'+todayBtn+
+    '<button class="btn ghost" id="plan-edit" style="flex:0 0 auto;width:auto;padding:0 14px;min-height:0">'+esc(t('planEdit'))+'</button></div>'+
+  '</div>';
 }
 
 /* ---------------- CATEGORIES ---------------- */
@@ -10263,6 +10472,99 @@ function viewIntro(kind){
   document.getElementById('go').onclick=function(){
     if(isLevel) startLevel(); else startMock();
   };
+}
+
+/* ---------------- PLA D'ESTUDI: configuració ---------------- */
+var PLAN_DRAFT=null;
+function viewPlanSetup(){
+  var existing=S.plan;
+  if(!PLAN_DRAFT) PLAN_DRAFT = existing? JSON.parse(JSON.stringify(existing)) : {weeks:4, days:Object.assign({},PLAN_DEFAULT_DAYS), shortLen:12, longLen:35, time:'20:00'};
+  var d=PLAN_DRAFT;
+  var DAYKEYS=['daySun','dayMon','dayTue','dayWed','dayThu','dayFri','daySat'];
+  var cap=planCapacityPerWeekDraft(d);
+  var realWeeks=cap? Math.max(1,Math.ceil(planTotalRemaining()/cap)) : null;
+  var anyDay=[0,1,2,3,4,5,6].some(function(i){return d.days[i]&&d.days[i]!=='none';});
+
+  var html='<div class="wrap stack fade">'+
+    '<h1>'+esc(t('planSetupTitle'))+'</h1>'+
+    '<p class="small muted">'+esc(t('planSetupIntro'))+'</p>'+
+    '<div class="card pad">'+
+      '<div class="small" style="font-weight:650;margin-bottom:8px">'+esc(t('planWeeksLabel'))+'</div>'+
+      '<div class="tabs">'+[2,3,4,6,8].map(function(n){return '<button data-weeks="'+n+'" class="'+(d.weeks===n?'on':'')+'">'+n+'</button>';}).join('')+'</div>'+
+    '</div>'+
+    '<div class="card pad">'+
+      '<div class="small" style="font-weight:650;margin-bottom:10px">'+esc(t('planDaysLabel'))+'</div>'+
+      '<div class="stack" style="gap:8px">'+
+      [0,1,2,3,4,5,6].map(function(i){
+        var type=d.days[i]||'none';
+        return '<div class="row" style="justify-content:space-between;gap:8px">'+
+          '<b style="width:34px;flex:none">'+esc(t(DAYKEYS[i]))+'</b>'+
+          '<div class="tabs" style="flex:1;margin-bottom:0" data-daypicker="'+i+'">'+
+            '<button data-dt="none" class="'+(type==='none'?'on':'')+'">'+esc(t('planDayNone'))+'</button>'+
+            '<button data-dt="short" class="'+(type==='short'?'on':'')+'">'+esc(t('planDayShort'))+'</button>'+
+            '<button data-dt="long" class="'+(type==='long'?'on':'')+'">'+esc(t('planDayLong'))+'</button>'+
+          '</div></div>';
+      }).join('')+
+      '</div></div>'+
+    '<div class="card pad">'+
+      '<div class="small" style="font-weight:650;margin-bottom:8px">'+esc(t('planLenLabel'))+'</div>'+
+      '<div class="tiny muted" style="margin-bottom:6px">'+esc(t('planShortLen',{'%n':d.shortLen}))+'</div>'+
+      '<div class="tabs">'+[8,12,16,20].map(function(n){return '<button data-short="'+n+'" class="'+(d.shortLen===n?'on':'')+'">'+n+'</button>';}).join('')+'</div>'+
+      '<div class="tiny muted" style="margin:10px 0 6px">'+esc(t('planLongLen',{'%n':d.longLen}))+'</div>'+
+      '<div class="tabs">'+[20,25,35,45].map(function(n){return '<button data-long="'+n+'" class="'+(d.longLen===n?'on':'')+'">'+n+'</button>';}).join('')+'</div>'+
+    '</div>'+
+    (anyDay?'<div class="card pad" style="border-color:'+(realWeeks&&realWeeks>d.weeks?'var(--ko)':'var(--ok)')+'"><p class="small">'+
+      (realWeeks&&realWeeks>d.weeks? esc(t('planNotFeasible',{'%n':realWeeks,'%w':d.weeks})) : esc(t('planFeasible')))+
+      '</p></div>' : '<div class="card pad"><p class="small muted">'+esc(t('planNoDays'))+'</p></div>')+
+    '<button class="btn primary" id="plan-save" '+(anyDay?'':'disabled')+'>'+esc(t('planSave'))+'</button>'+
+    (existing? '<button class="btn ghost" id="plan-cancel">'+esc(t('cancel'))+'</button>' : '')+
+    (existing? (
+      '<div class="sec-title"><h2>'+esc(t('planCalendar'))+'</h2></div>'+
+      '<div class="card pad">'+
+        '<p class="tiny muted" style="margin-bottom:10px">'+esc(t('planCalendarD'))+'</p>'+
+        '<p class="tiny muted" style="margin-bottom:10px">'+esc(t('planNoNotifD'))+'</p>'+
+        '<div class="row" style="gap:10px;align-items:center;margin-bottom:12px">'+
+          '<label class="small" for="plan-time">'+esc(t('planCalendarTime'))+'</label>'+
+          '<input type="time" id="plan-time" value="'+esc(existing.time||'20:00')+'" style="border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--bg2);color:var(--fg)">'+
+        '</div>'+
+        '<button class="btn" id="plan-ics">'+IC.down+'<span>'+esc(t('planCalendar'))+'</span></button>'+
+      '</div>'+
+      '<button class="btn ghost" id="plan-toggle">'+esc(existing.active? t('planPause'):t('planResume'))+'</button>'+
+      '<button class="btn danger" id="plan-delete">'+esc(t('planDelete'))+'</button>'
+    ) : '')+
+  '</div>';
+  app.innerHTML=html;
+
+  document.querySelectorAll('[data-weeks]').forEach(function(b){ b.onclick=function(){ d.weeks=parseInt(b.dataset.weeks,10); viewPlanSetup(); }; });
+  document.querySelectorAll('[data-daypicker]').forEach(function(box){
+    var i=parseInt(box.dataset.daypicker,10);
+    box.querySelectorAll('[data-dt]').forEach(function(b){ b.onclick=function(){ d.days[i]=b.dataset.dt; viewPlanSetup(); }; });
+  });
+  document.querySelectorAll('[data-short]').forEach(function(b){ b.onclick=function(){ d.shortLen=parseInt(b.dataset.short,10); viewPlanSetup(); }; });
+  document.querySelectorAll('[data-long]').forEach(function(b){ b.onclick=function(){ d.longLen=parseInt(b.dataset.long,10); viewPlanSetup(); }; });
+  var cancelBtn=document.getElementById('plan-cancel'); if(cancelBtn) cancelBtn.onclick=function(){ PLAN_DRAFT=null; go('home'); };
+  var icsBtn=document.getElementById('plan-ics'); if(icsBtn) icsBtn.onclick=function(){
+    var timeInput=document.getElementById('plan-time');
+    if(timeInput && timeInput.value){ S.plan.time=timeInput.value; save(); }
+    planICS();
+  };
+  var toggleBtn=document.getElementById('plan-toggle'); if(toggleBtn) toggleBtn.onclick=function(){ S.plan.active=!S.plan.active; save(); PLAN_DRAFT=null; go('home'); };
+  var delBtn=document.getElementById('plan-delete'); if(delBtn) delBtn.onclick=function(){
+    ask(t('planDeleteAsk'),t('planDelete'),function(){ S.plan=null; PLAN_DRAFT=null; save(); go('home'); },true);
+  };
+  document.getElementById('plan-save').onclick=function(){
+    if(!anyDay) return;
+    var wasActive=!!S.plan;
+    S.plan={ weeks:d.weeks, days:d.days, shortLen:d.shortLen, longLen:d.longLen, time:S.plan?S.plan.time:'20:00',
+      startDay: (S.plan&&S.plan.startDay)? S.plan.startDay : Date.now(),
+      baseline: (S.plan&&S.plan.baseline!==undefined)? S.plan.baseline : planAnswersEver(),
+      active:true };
+    PLAN_DRAFT=null; save(); go('home'); toast(wasActive? t('planSave') : t('planReady'));
+  };
+}
+function planCapacityPerWeekDraft(d){
+  var c=0; for(var i=0;i<7;i++){ var t=d.days[i]; if(t==='short') c+=d.shortLen; else if(t==='long') c+=d.longLen; }
+  return c;
 }
 
 function startLevel(){
@@ -10950,6 +11252,7 @@ function openSettings(){
   sh.querySelector('.panel').innerHTML=
     '<div class="grip"></div><h2 style="margin-bottom:14px">'+esc(t('settings'))+'</h2>'+
     '<div class="stack">'+
+      '<button class="btn" id="s-plan">'+IC.calendar+'<span>'+esc(t('planTitle'))+'</span></button>'+
       '<div><div class="small" style="font-weight:650;margin-bottom:6px">'+esc(t('srs'))+'</div>'+
         '<div class="tabs"><button data-srs="1" class="'+(S.srs?'on':'')+'">'+esc(S.lang==='ca'?'Activada':'Activada')+'</button>'+
         '<button data-srs="0" class="'+(!S.srs?'on':'')+'">'+esc(S.lang==='ca'?'Atzar pur':'Azar puro')+'</button></div>'+
@@ -10982,11 +11285,12 @@ function openSettings(){
   sh.querySelectorAll('[data-len]').forEach(function(b){ b.onclick=function(){ S.len=parseInt(b.dataset.len,10); save(); openSettings(); }; });
   sh.querySelectorAll('[data-th]').forEach(function(b){ b.onclick=function(){ S.theme=b.dataset.th; save(); applyTheme(); openSettings(); }; });
   document.getElementById('s-close').onclick=closeSheet;
+  document.getElementById('s-plan').onclick=function(){ closeSheet(); go('planSetup'); };
   document.getElementById('s-exp').onclick=doExport;
   document.getElementById('s-imp').onclick=function(){ document.getElementById('s-file').click(); };
   document.getElementById('s-file').onchange=doImport;
   document.getElementById('s-reset').onclick=function(){
-    ask(t('resetAsk'),t('reset'),function(){ S.p={}; S.hist=[]; S.streak=0; S.day=null; S.lastMock=null; S.lastLevel=null; S.cur=null; S.view=null; SESSION=null; save(); go('home'); },true);
+    ask(t('resetAsk'),t('reset'),function(){ S.p={}; S.hist=[]; S.streak=0; S.day=null; S.lastMock=null; S.lastLevel=null; S.cur=null; S.view=null; S.plan=null; S.planPromptDismissed=false; SESSION=null; save(); go('home'); },true);
   };
 }
 function closeSheet(){ document.getElementById('sheet').classList.remove('on'); }

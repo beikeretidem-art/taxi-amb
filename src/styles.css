@@ -235,6 +235,8 @@ main{padding:18px 0 80px}
 .eixdiag{stroke:var(--acc2);stroke-width:1.4;stroke-dasharray:6 4;opacity:.5}
 .eixpoi{stroke:var(--bg2);stroke-width:1.5;cursor:pointer}
 .eixpoi-ring{fill:none;stroke-width:2;opacity:.5}
+.eixpoi-label{display:none;font-size:8.5px;fill:var(--fg2);pointer-events:none;paint-order:stroke;stroke:var(--bg2);stroke-width:2.5px}
+g.eix-poi-zoomed .eixpoi-label{display:inline}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
 
 .fade{animation:fade .28s ease}

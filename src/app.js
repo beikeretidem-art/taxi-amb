@@ -1538,7 +1538,8 @@ function eixBuildSvg(verticals, horizontals, D){
   var W=verticals.length, colW=36, padL=92;
   var maxHName=horizontals.reduce(function(m,hh){return Math.max(m,(hh.name||'').length);},0);
   var padR=30+maxHName*6.1; /* prou espai perquè els noms de carrers horitzontals no es tallin */
-  var rowH=34, padT=58, padB=26, labelY=20;
+  var maxVName=verticals.reduce(function(m,v){return Math.max(m,(v.name||'').length);},0);
+  var rowH=34, padT=30+maxVName*4.4, padB=26; /* prou espai perquè les etiquetes rotades no es tallin ni toquin la fila 0 */
   var gridW=padL+(W-1)*colW+padR, gridH=padT+(horizontals.length-1)*rowH+padB;
   function vx(order){ var i=verticals.findIndex(function(v){return v.order===order;}); return padL+i*colW; }
   var ns='http://www.w3.org/2000/svg';
@@ -1559,7 +1560,8 @@ function eixBuildSvg(verticals, horizontals, D){
     var x=padL+i*colW;
     var line=el('line',{x1:x,y1:padT,x2:x,y2:padT+(horizontals.length-1)*rowH,class:'eixline-v','data-id':v.id});
     svg.appendChild(line); vLines[v.id]=line;
-    var lbl=el('text',{x:x+4,y:labelY,class:'eixlabel-v',transform:'rotate(-55 '+(x+4)+' '+labelY+')','data-id':v.id});
+    var lblY=padT-9;
+    var lbl=el('text',{x:x+4,y:lblY,class:'eixlabel-v',transform:'rotate(-55 '+(x+4)+' '+lblY+')','data-id':v.id});
     lbl.textContent=v.name; svg.appendChild(lbl); vLabels[v.id]=lbl;
   });
   var diagSpecs=[0.06,0.16,0.30,0.50,0.68,0.20,0.62,0.80,0.90];
@@ -1597,7 +1599,13 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
     c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',4);
     c.setAttribute('class','eixpoi'); c.setAttribute('fill',EIX_CAT_COLOR[p.cat]||'#888'); c.setAttribute('data-cat',p.cat);
     var lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
-    lbl.setAttribute('x',x+7); lbl.setAttribute('y',y+3);
+    if(hIdx===0){
+      /* fila 0: el nom a sota del punt, mai a la dreta — a dalt hi ha les etiquetes
+       * rotades dels carrers verticals i xocarien amb el text */
+      lbl.setAttribute('x',x); lbl.setAttribute('y',y+16); lbl.setAttribute('text-anchor','middle');
+    } else {
+      lbl.setAttribute('x',x+7); lbl.setAttribute('y',y+3);
+    }
     lbl.setAttribute('class','eixpoi-label'); lbl.setAttribute('data-cat',p.cat);
     lbl.textContent=p.name;
     if(!visible){ ring.style.display='none'; c.style.display='none'; lbl.style.display='none'; }

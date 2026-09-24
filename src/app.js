@@ -263,6 +263,7 @@ var T = {
   eixDiag:{ca:'Diagonals',es:'Diagonales'},
   eixPoi:{ca:'Punts d’interès',es:'Puntos de interés'},
   eixBarris:{ca:'Barris',es:'Barrios'},
+  eixFit:{ca:'Tot',es:'Todo'},
   eixBarrisTitle:{ca:'Barris de l’Eixample',es:'Barrios del Eixample'},
   eixFrom:{ca:'De',es:'De'},
   eixTo:{ca:'a',es:'a'},
@@ -305,6 +306,7 @@ var T = {
   planBehindLot:{ca:'Molt endarrerit — pots ajustar el pla',es:'Muy atrasado — puedes ajustar el plan'},
   planTodayLong:{ca:'Avui toca sessió llarga',es:'Hoy toca sesión larga'},
   planTodayShort:{ca:'Avui toca sessió curta',es:'Hoy toca sesión corta'},
+  planTodayIntense:{ca:'Avui toca sessió intensiva',es:'Hoy toca sesión intensiva'},
   planTodayNone:{ca:'Avui no tenies sessió',es:'Hoy no tenías sesión'},
   planTodayNoneD:{ca:'Un repàs ràpid opcional evita que se t’oblidi',es:'Un repaso rápido opcional evita que se te olvide'},
   planQuickReview:{ca:'Repàs ràpid (%n)',es:'Repaso rápido (%n)'},
@@ -314,12 +316,14 @@ var T = {
   planSetupIntro:{ca:'Tria quantes setmanes tens fins a l’examen i quins dies pots estudiar. Toca cada dia per canviar-ne el tipus de sessió.',es:'Elige cuántas semanas tienes hasta el examen y qué días puedes estudiar. Toca cada día para cambiar el tipo de sesión.'},
   planWeeksLabel:{ca:'Setmanes fins a l’examen',es:'Semanas hasta el examen'},
   planDaysLabel:{ca:'Dies disponibles',es:'Días disponibles'},
-  planDayNone:{ca:'Sense sessió',es:'Sin sesión'},
+  planDayNone:{ca:'Sense',es:'Sin'},
   planDayShort:{ca:'Curta',es:'Corta'},
   planDayLong:{ca:'Llarga',es:'Larga'},
+  planDayIntense:{ca:'Intensa',es:'Intensa'},
   planLenLabel:{ca:'Mida de les sessions',es:'Tamaño de las sesiones'},
   planShortLen:{ca:'Curta: %n preguntes',es:'Corta: %n preguntas'},
   planLongLen:{ca:'Llarga: %n preguntes',es:'Larga: %n preguntas'},
+  planIntenseLen:{ca:'Intensiva: %n preguntes',es:'Intensiva: %n preguntas'},
   planFeasible:{ca:'Amb aquesta disponibilitat cobriràs tot el temari a temps.',es:'Con esta disponibilidad cubrirás todo el temario a tiempo.'},
   planNotFeasible:{ca:'Amb aquesta disponibilitat trigaràs unes %n setmanes a cobrir tot el temari, no %w.',es:'Con esta disponibilidad tardarás unas %n semanas en cubrir todo el temario, no %w.'},
   planNoDays:{ca:'Marca almenys un dia per activar el pla.',es:'Marca al menos un día para activar el plan.'},
@@ -541,8 +545,11 @@ function strongTopics(min){
 }
 
 /* ---------------- pla d'estudi ---------------- */
-/* plan.days: {0..6: 'none'|'short'|'long'} — clau = Date.getDay() (0=diumenge) */
+/* plan.days: {0..6: 'none'|'short'|'long'|'intense'} — clau = Date.getDay() (0=diumenge) */
 var PLAN_DEFAULT_DAYS = {0:'none',1:'short',2:'none',3:'short',4:'none',5:'short',6:'long'};
+var PLAN_LEN_FIELD = {short:'shortLen', long:'longLen', intense:'intenseLen'};
+var PLAN_TODAY_KEY = {short:'planTodayShort', long:'planTodayLong', intense:'planTodayIntense'};
+var PLAN_LEN_KEY = {short:'planShortLen', long:'planLongLen', intense:'planIntenseLen'};
 function planTotalRemaining(){
   var rem=0;
   DB.forEach(function(q){ var p=S.p[q.i]; var b=p?(p.b||0):0; rem+=Math.max(0,4-b); });
@@ -550,7 +557,7 @@ function planTotalRemaining(){
 }
 function planCapacityPerWeek(plan){
   plan=plan||S.plan; if(!plan) return 0;
-  var c=0; for(var d=0;d<7;d++){ var t=plan.days[d]; if(t==='short') c+=plan.shortLen; else if(t==='long') c+=plan.longLen; }
+  var c=0; for(var d=0;d<7;d++){ var t=plan.days[d]; var f=PLAN_LEN_FIELD[t]; if(f) c+=plan[f]||0; }
   return c;
 }
 function planRealisticWeeks(plan){
@@ -558,7 +565,7 @@ function planRealisticWeeks(plan){
   return Math.max(1,Math.ceil(planTotalRemaining()/cap));
 }
 function planDayType(dateObj, plan){ plan=plan||S.plan; if(!plan) return 'none'; return plan.days[dateObj.getDay()]||'none'; }
-function planLenFor(type){ var plan=S.plan; if(!plan) return S.len; return type==='long'?plan.longLen:(type==='short'?plan.shortLen:0); }
+function planLenFor(type){ var plan=S.plan; if(!plan) return S.len; var f=PLAN_LEN_FIELD[type]; return f?(plan[f]||0):0; }
 function planWeeksElapsed(){
   var plan=S.plan; if(!plan||!plan.startDay) return 0;
   return Math.floor((Date.now()-plan.startDay)/(7*864e5));
@@ -569,7 +576,7 @@ function planExpectedByNow(){
   var start=new Date(plan.startDay); start.setHours(0,0,0,0);
   var now=new Date(); now.setHours(0,0,0,0);
   var exp=0, d=new Date(start), guard=0;
-  while(d<=now && guard<400){ var t=planDayType(d,plan); if(t==='short') exp+=plan.shortLen; else if(t==='long') exp+=plan.longLen; d.setDate(d.getDate()+1); guard++; }
+  while(d<=now && guard<400){ var t=planDayType(d,plan); var f=PLAN_LEN_FIELD[t]; if(f) exp+=plan[f]||0; d.setDate(d.getDate()+1); guard++; }
   return exp;
 }
 function planAnswersEver(){
@@ -611,8 +618,8 @@ function planICS(){
     var diff=(d-dt.getDay()+7)%7;
     dt.setDate(dt.getDate()+diff);
     var dtstr=dt.getFullYear()+pad2(dt.getMonth()+1)+pad2(dt.getDate())+'T'+pad2(hh)+pad2(mm)+'00';
-    var summary=(type==='long'?t('planTodayLong'):t('planTodayShort'))+' — '+t('appName');
-    var descr=type==='long'? t('planLongLen',{'%n':plan.longLen}) : t('planShortLen',{'%n':plan.shortLen});
+    var summary=t(PLAN_TODAY_KEY[type]||'planTodayShort')+' — '+t('appName');
+    var descr=t(PLAN_LEN_KEY[type]||'planShortLen',{'%n':plan[PLAN_LEN_FIELD[type]]||0});
     lines.push('BEGIN:VEVENT');
     lines.push('UID:taxiamb-plan-'+d+'-'+Date.now()+'@taxiamb.github.io');
     lines.push('DTSTAMP:'+dtstr);
@@ -853,7 +860,7 @@ function planCard(){
     var qpool=planQuickReviewPool();
     todayBtn='<button class="btn" id="plan-quick" style="flex:1">'+IC.flip+'<span>'+esc(t('planQuickReview',{'%n':Math.min(8,qpool.length||8)}))+'</span></button>';
   } else {
-    todayLine='<b>'+esc(type==='long'? t('planTodayLong'):t('planTodayShort'))+'</b><div class="tiny muted">'+esc((type==='long'?t('planLongLen',{'%n':S.plan.longLen}):t('planShortLen',{'%n':S.plan.shortLen})))+'</div>';
+    todayLine='<b>'+esc(t(PLAN_TODAY_KEY[type]||'planTodayShort'))+'</b><div class="tiny muted">'+esc(t(PLAN_LEN_KEY[type]||'planShortLen',{'%n':S.plan[PLAN_LEN_FIELD[type]]||0}))+'</div>';
     todayBtn='<button class="btn primary" id="plan-go" style="flex:1">'+IC.play+'<span>'+esc(t('planStartSession'))+'</span></button>';
   }
   return '<div class="card pad">'+
@@ -1003,7 +1010,10 @@ function viewIntro(kind){
 var PLAN_DRAFT=null;
 function viewPlanSetup(){
   var existing=S.plan;
-  if(!PLAN_DRAFT) PLAN_DRAFT = existing? JSON.parse(JSON.stringify(existing)) : {weeks:4, days:Object.assign({},PLAN_DEFAULT_DAYS), shortLen:12, longLen:35, time:'20:00'};
+  if(!PLAN_DRAFT){
+    var base={weeks:4, days:Object.assign({},PLAN_DEFAULT_DAYS), shortLen:14, longLen:40, intenseLen:90, time:'20:00'};
+    PLAN_DRAFT = existing? Object.assign({}, base, JSON.parse(JSON.stringify(existing))) : base;
+  }
   var d=PLAN_DRAFT;
   var DAYKEYS=['daySun','dayMon','dayTue','dayWed','dayThu','dayFri','daySat'];
   var cap=planCapacityPerWeekDraft(d);
@@ -1028,15 +1038,18 @@ function viewPlanSetup(){
             '<button data-dt="none" class="'+(type==='none'?'on':'')+'">'+esc(t('planDayNone'))+'</button>'+
             '<button data-dt="short" class="'+(type==='short'?'on':'')+'">'+esc(t('planDayShort'))+'</button>'+
             '<button data-dt="long" class="'+(type==='long'?'on':'')+'">'+esc(t('planDayLong'))+'</button>'+
+            '<button data-dt="intense" class="'+(type==='intense'?'on':'')+'">'+esc(t('planDayIntense'))+'</button>'+
           '</div></div>';
       }).join('')+
       '</div></div>'+
     '<div class="card pad">'+
       '<div class="small" style="font-weight:650;margin-bottom:8px">'+esc(t('planLenLabel'))+'</div>'+
       '<div class="tiny muted" style="margin-bottom:6px">'+esc(t('planShortLen',{'%n':d.shortLen}))+'</div>'+
-      '<div class="tabs">'+[8,12,16,20].map(function(n){return '<button data-short="'+n+'" class="'+(d.shortLen===n?'on':'')+'">'+n+'</button>';}).join('')+'</div>'+
+      '<div class="tabs">'+[8,14,20,28].map(function(n){return '<button data-short="'+n+'" class="'+(d.shortLen===n?'on':'')+'">'+n+'</button>';}).join('')+'</div>'+
       '<div class="tiny muted" style="margin:10px 0 6px">'+esc(t('planLongLen',{'%n':d.longLen}))+'</div>'+
-      '<div class="tabs">'+[20,25,35,45].map(function(n){return '<button data-long="'+n+'" class="'+(d.longLen===n?'on':'')+'">'+n+'</button>';}).join('')+'</div>'+
+      '<div class="tabs">'+[28,40,50,60].map(function(n){return '<button data-long="'+n+'" class="'+(d.longLen===n?'on':'')+'">'+n+'</button>';}).join('')+'</div>'+
+      '<div class="tiny muted" style="margin:10px 0 6px">'+esc(t('planIntenseLen',{'%n':d.intenseLen}))+'</div>'+
+      '<div class="tabs">'+[60,90,120,150].map(function(n){return '<button data-intense="'+n+'" class="'+(d.intenseLen===n?'on':'')+'">'+n+'</button>';}).join('')+'</div>'+
     '</div>'+
     (anyDay?'<div class="card pad" style="border-color:'+(realWeeks&&realWeeks>d.weeks?'var(--ko)':'var(--ok)')+'"><p class="small">'+
       (realWeeks&&realWeeks>d.weeks? esc(t('planNotFeasible',{'%n':realWeeks,'%w':d.weeks})) : esc(t('planFeasible')))+
@@ -1067,6 +1080,7 @@ function viewPlanSetup(){
   });
   document.querySelectorAll('[data-short]').forEach(function(b){ b.onclick=function(){ d.shortLen=parseInt(b.dataset.short,10); viewPlanSetup(); }; });
   document.querySelectorAll('[data-long]').forEach(function(b){ b.onclick=function(){ d.longLen=parseInt(b.dataset.long,10); viewPlanSetup(); }; });
+  document.querySelectorAll('[data-intense]').forEach(function(b){ b.onclick=function(){ d.intenseLen=parseInt(b.dataset.intense,10); viewPlanSetup(); }; });
   var cancelBtn=document.getElementById('plan-cancel'); if(cancelBtn) cancelBtn.onclick=function(){ PLAN_DRAFT=null; go('home'); };
   var icsBtn=document.getElementById('plan-ics'); if(icsBtn) icsBtn.onclick=function(){
     var timeInput=document.getElementById('plan-time');
@@ -1080,7 +1094,7 @@ function viewPlanSetup(){
   document.getElementById('plan-save').onclick=function(){
     if(!anyDay) return;
     var wasActive=!!S.plan;
-    S.plan={ weeks:d.weeks, days:d.days, shortLen:d.shortLen, longLen:d.longLen, time:S.plan?S.plan.time:'20:00',
+    S.plan={ weeks:d.weeks, days:d.days, shortLen:d.shortLen, longLen:d.longLen, intenseLen:d.intenseLen, time:S.plan?S.plan.time:'20:00',
       startDay: (S.plan&&S.plan.startDay)? S.plan.startDay : Date.now(),
       baseline: (S.plan&&S.plan.baseline!==undefined)? S.plan.baseline : planAnswersEver(),
       active:true };
@@ -1088,7 +1102,7 @@ function viewPlanSetup(){
   };
 }
 function planCapacityPerWeekDraft(d){
-  var c=0; for(var i=0;i<7;i++){ var t=d.days[i]; if(t==='short') c+=d.shortLen; else if(t==='long') c+=d.longLen; }
+  var c=0; for(var i=0;i<7;i++){ var t=d.days[i]; var f=PLAN_LEN_FIELD[t]; if(f) c+=d[f]||0; }
   return c;
 }
 
@@ -1521,13 +1535,15 @@ function viewEixMap(){
   eixRenderExplore(body, D, verticals, horizontals, POIS);
 }
 function eixBuildSvg(verticals, horizontals, D){
-  var W=verticals.length, colW=36, padL=92, padR=26;
+  var W=verticals.length, colW=36, padL=92;
+  var maxHName=horizontals.reduce(function(m,hh){return Math.max(m,(hh.name||'').length);},0);
+  var padR=30+maxHName*6.1; /* prou espai perquè els noms de carrers horitzontals no es tallin */
   var rowH=34, padT=32, padB=26;
   var gridW=padL+(W-1)*colW+padR, gridH=padT+(horizontals.length-1)*rowH+padB;
   function vx(order){ var i=verticals.findIndex(function(v){return v.order===order;}); return padL+i*colW; }
   var ns='http://www.w3.org/2000/svg';
   function el(tag,attrs){ var e=document.createElementNS(ns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
-  var svg=el('svg',{width:gridW,height:gridH,viewBox:'0 0 '+gridW+' '+gridH});
+  var svg=el('svg',{viewBox:'0 0 '+gridW+' '+gridH});
   var hLines={}, hLabels={};
   horizontals.forEach(function(hh,i){
     var y=padT+i*rowH;
@@ -1560,19 +1576,26 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
   var built=eixBuildSvg(verticals, horizontals, D);
   var svg=built.svg;
   var poiGroup=document.createElementNS('http://www.w3.org/2000/svg','g');
-  var poiCountByCol={};
+  var poiSlot={};
   POIS.forEach(function(p){
     var v=verticals.find(function(vv){return vv.id===p.near;});
     if(!v) return;
+    var hIdx=horizontals.findIndex(function(hh){return hh.id===p.nearH;});
+    if(hIdx<0) hIdx=0;
     var x=built.vx(v.order);
-    var slot=poiCountByCol[v.id]||0; poiCountByCol[v.id]=slot+1;
-    var y=built.padT+24+(slot%(built.horizontals.length-2))*(built.rowH*0.92)+(Math.floor(slot/(built.horizontals.length-2))*10);
+    var y=built.padT+hIdx*built.rowH;
+    /* si dos punts cauen exactament al mateix encreuament, separa'ls una mica perquè no es tapin */
+    var key=v.id+'|'+hIdx;
+    var slot=poiSlot[key]||0; poiSlot[key]=slot+1;
+    if(slot>0){ x+=(slot%2===1? 1:-1)*Math.ceil(slot/2)*12; }
+    var visible=EIXVIEW.activeCats[p.cat]!==false;
     var ring=document.createElementNS('http://www.w3.org/2000/svg','circle');
     ring.setAttribute('cx',x); ring.setAttribute('cy',y); ring.setAttribute('r',9);
     ring.setAttribute('class','eixpoi-ring'); ring.setAttribute('stroke',EIX_CAT_COLOR[p.cat]||'#888'); ring.setAttribute('data-cat',p.cat);
     var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
     c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',6);
     c.setAttribute('class','eixpoi'); c.setAttribute('fill',EIX_CAT_COLOR[p.cat]||'#888'); c.setAttribute('data-cat',p.cat);
+    if(!visible){ ring.style.display='none'; c.style.display='none'; }
     c.addEventListener('click',function(e){ e.stopPropagation(); eixDetail('<b style="display:block;margin-bottom:6px;font-size:1rem">'+esc(p.name)+'</b>'+
       '<div class="tiny muted">'+esc(p.addr)+'</div><span class="pill" style="margin-top:8px;background:'+(EIX_CAT_COLOR[p.cat]||'#888')+';color:#1b1405;font-weight:700">'+esc(eixCatLabel(p.cat))+'</span>'); });
     poiGroup.appendChild(ring); poiGroup.appendChild(c);
@@ -1621,8 +1644,16 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
       '<button class="chip" id="eix-barris">'+esc(t('eixBarris'))+'</button>'+
     '</div>'+
     '<div class="row" id="eix-catbar" style="gap:8px;overflow-x:auto;padding:0 2px 10px;flex-wrap:nowrap">'+catBar+'</div>'+
-    '<div class="card" id="eix-stage" style="overflow:auto;height:60vh;padding:10px"></div>';
-  document.getElementById('eix-stage').appendChild(svg);
+    '<div class="card" id="eix-stage" style="position:relative;overflow:hidden;height:60vh;padding:0">'+
+      '<div style="position:absolute;right:10px;bottom:10px;z-index:2;display:flex;flex-direction:column;gap:6px">'+
+        '<button class="iconbtn" id="eix-zoomin" style="background:var(--bg2)">+</button>'+
+        '<button class="iconbtn" id="eix-zoomout" style="background:var(--bg2)">−</button>'+
+        '<button class="iconbtn" id="eix-zoomfit" style="background:var(--bg2);font-size:.7rem">'+esc(t('eixFit'))+'</button>'+
+      '</div>'+
+    '</div>';
+  var stage=document.getElementById('eix-stage');
+  stage.appendChild(svg);
+  eixAttachPanZoom(svg, built.gridW, built.gridH, stage);
 
   document.getElementById('eix-barris').onclick=function(){
     eixDetail('<b style="display:block;margin-bottom:8px;font-size:1rem">'+esc(t('eixBarrisTitle'))+'</b>'+
@@ -1634,7 +1665,7 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
       chip.classList.toggle('on',on);
       if(key==='names'){ Object.values(built.vLabels).concat(Object.values(built.hLabels)).forEach(function(l){ l.style.display=on?'':'none'; }); }
       else if(key==='diag'){ built.diagGroup.style.display=on?'':'none'; }
-      else if(key==='poi'){ poiGroup.style.display=on?'':'none'; document.getElementById('eix-catbar').style.display=on?'flex':'none'; }
+      else if(key==='poi'){ poiGroup.style.display=on?'':'none'; }
     };
   });
   body.querySelectorAll('#eix-catbar [data-cat]').forEach(function(chip){
@@ -1647,6 +1678,75 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
     };
   });
   svg.addEventListener('click',function(e){ if(e.target===svg) clearHi(); });
+}
+/* Pan/zoom tipus Google Maps sobre el propi mapa (viewBox), no sobre la pàgina.
+ * touch-action:none evita que el navegador faci zoom de pàgina en fer pinch. */
+function eixAttachPanZoom(svg, gridW, gridH, container){
+  var vx=0, vy=0, vw=gridW, vh=gridH;
+  var minVw=gridW*0.16, maxVw=gridW;
+  function apply(){ svg.setAttribute('viewBox', vx+' '+vy+' '+vw+' '+vh); }
+  function clamp(){
+    if(vw<minVw) vw=minVw; if(vw>maxVw) vw=maxVw;
+    var r=container.getBoundingClientRect();
+    var aspect=(r.height||1)/(r.width||1);
+    vh=vw*aspect;
+    if(vx<0) vx=0; if(vx>gridW-vw) vx=Math.max(0,gridW-vw);
+    if(vy<0) vy=0; if(vy>gridH-vh) vy=Math.max(0,gridH-vh);
+  }
+  function toUser(clientX,clientY){
+    var r=svg.getBoundingClientRect();
+    return { x:vx+(clientX-r.left)/(r.width||1)*vw, y:vy+(clientY-r.top)/(r.height||1)*vh };
+  }
+  function zoomAt(factor, clientX, clientY){
+    var before=toUser(clientX,clientY);
+    vw*=factor; clamp();
+    var after=toUser(clientX,clientY);
+    vx+=(before.x-after.x); vy+=(before.y-after.y);
+    clamp(); apply();
+  }
+  clamp(); apply();
+
+  var pts={}, THRESH=4;
+  function dist(a,b){ return Math.hypot(a.x-b.x,a.y-b.y); }
+  svg.addEventListener('pointerdown',function(e){
+    pts[e.pointerId]={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,dragging:false,captured:false};
+  });
+  svg.addEventListener('pointermove',function(e){
+    var p=pts[e.pointerId]; if(!p) return;
+    var ids=Object.keys(pts);
+    if(ids.length===1){
+      if(!p.dragging){
+        if(Math.abs(e.clientX-p.startX)>THRESH || Math.abs(e.clientY-p.startY)>THRESH){ p.dragging=true; try{svg.setPointerCapture(e.pointerId);}catch(err){} }
+        else return;
+      }
+      var r=svg.getBoundingClientRect();
+      vx-=(e.clientX-p.x)/(r.width||1)*vw; vy-=(e.clientY-p.y)/(r.height||1)*vh;
+      p.x=e.clientX; p.y=e.clientY;
+      clamp(); apply();
+    } else if(ids.length===2){
+      var otherId=ids[0]===String(e.pointerId)?ids[1]:ids[0];
+      var other=pts[otherId];
+      if(!p.dragging){ p.dragging=true; try{svg.setPointerCapture(e.pointerId);}catch(err){} }
+      var prevDist=dist(p,other), newSelf={x:e.clientX,y:e.clientY}, newDist=dist(newSelf,other);
+      var mid={x:(newSelf.x+other.x)/2,y:(newSelf.y+other.y)/2};
+      if(prevDist>0 && newDist>0) zoomAt(prevDist/newDist, mid.x, mid.y);
+      p.x=e.clientX; p.y=e.clientY;
+    }
+  });
+  function endPt(e){ delete pts[e.pointerId]; }
+  svg.addEventListener('pointerup',endPt);
+  svg.addEventListener('pointercancel',endPt);
+  svg.addEventListener('pointerleave',endPt);
+  svg.addEventListener('wheel',function(e){
+    e.preventDefault();
+    zoomAt(Math.pow(1.0016, e.deltaY), e.clientX, e.clientY);
+  },{passive:false});
+  svg.addEventListener('dblclick',function(e){ zoomAt(1/1.6, e.clientX, e.clientY); });
+
+  function zoomStep(factor){ var r=container.getBoundingClientRect(); zoomAt(factor, r.left+r.width/2, r.top+r.height/2); }
+  var zin=document.getElementById('eix-zoomin'); if(zin) zin.onclick=function(){ zoomStep(1/1.4); };
+  var zout=document.getElementById('eix-zoomout'); if(zout) zout.onclick=function(){ zoomStep(1.4); };
+  var zfit=document.getElementById('eix-zoomfit'); if(zfit) zfit.onclick=function(){ vw=gridW; vx=0; vy=0; clamp(); apply(); };
 }
 function eixRenderLesson(body, verticals){
   var CHUNK=6;

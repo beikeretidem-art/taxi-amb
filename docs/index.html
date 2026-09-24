@@ -11075,23 +11075,38 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
     if(slot>0){ x+=(slot%2===1? 1:-1)*Math.ceil(slot/2)*14; }
     placements.push({p:p, x:x, y:y, slot:slot});
   });
-  /* si el nom (en diagonal amunt-dreta) passaria molt a prop d'un altre punt — típic
-   * quan dos POI són a la mateixa columna en files consecutives — es capgira: el nom
-   * surt avall-esquerra i s'hi ancora per l'última lletra en lloc de la primera.
-   * També es capgira si, anant amunt, el nom sortiria per damunt del marge superior
-   * del mapa (les files 0 i 1 no tenen prou espai a sobre per a noms llargs). */
+  /* Per a cada punt, tria entre 4 diagonals possibles (amunt-dreta, avall-esquerra,
+   * avall-dreta, amunt-esquerra) la que quedi més lluny d'altres punts i que no es
+   * surti pel marge superior/inferior del mapa — en lloc d'una regla fixa. */
+  var EIX_POI_DIRS={
+    NE:{rot:-55, endAnchor:false, ox:6,  oy:3,  ux:0.574, uy:-0.819},
+    SW:{rot:-55, endAnchor:true,  ox:-6, oy:-3, ux:-0.574,uy:0.819},
+    SE:{rot:55,  endAnchor:false, ox:6,  oy:3,  ux:0.574, uy:0.819},
+    NW:{rot:55,  endAnchor:true,  ox:-6, oy:-3, ux:-0.574,uy:-0.819}
+  };
   placements.forEach(function(pl){
-    var collides=placements.some(function(other){
-      if(other===pl) return false;
-      var dx=other.x-pl.x, dy=other.y-pl.y;
-      return dy<-6 && dy>-46 && Math.abs(dx)<66;
+    var estLen=pl.p.name.length*5.2;
+    var best=null, bestScore=Infinity;
+    ['NE','SE','NW','SW'].forEach(function(dirName){
+      var d=EIX_POI_DIRS[dirName];
+      var ax=pl.x+d.ox, ay=pl.y+d.oy, fx=ax+d.ux*estLen, fy=ay+d.uy*estLen;
+      var minY=Math.min(ay,fy), maxY=Math.max(ay,fy);
+      var score=0;
+      if(minY<6 || maxY>built.gridH-6) score+=1e6; /* mai sortir del mapa */
+      placements.forEach(function(other){
+        if(other===pl) return;
+        for(var i=0;i<=6;i++){
+          var t=i/6, px=ax+(fx-ax)*t, py=ay+(fy-ay)*t;
+          var dist=Math.hypot(other.x-px, other.y-py);
+          if(dist<16) score+=(16-dist);
+        }
+      });
+      if(score<bestScore){ bestScore=score; best=dirName; }
     });
-    var estThrow=pl.p.name.length*5.2*0.82; /* alçada aproximada del nom en diagonal */
-    var wouldClipTop=(pl.y-estThrow)<6;
-    pl.flip=collides||wouldClipTop;
+    pl.dir=best;
   });
   placements.forEach(function(pl){
-    var p=pl.p, x=pl.x, y=pl.y, slot=pl.slot, flip=pl.flip;
+    var p=pl.p, x=pl.x, y=pl.y, d=EIX_POI_DIRS[pl.dir];
     var visible=EIXVIEW.activeCats[p.cat]!==false;
     var ring=document.createElementNS('http://www.w3.org/2000/svg','circle');
     ring.setAttribute('cx',x); ring.setAttribute('cy',y); ring.setAttribute('r',6);
@@ -11100,12 +11115,10 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
     c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',4);
     c.setAttribute('class','eixpoi'); c.setAttribute('fill',EIX_CAT_COLOR[p.cat]||'#888'); c.setAttribute('data-cat',p.cat);
     var lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
-    /* si comparteix encreuament amb un altre punt, allunya una mica el nom perquè
-     * no es solapin entre ells; en diagonal (com els noms de carrer) per estalviar espai */
-    var lx=flip? x-6:x+6, ly=(flip? y-3:y+3)+(slot%2===1? 9:0);
+    var lx=x+d.ox, ly=y+d.oy;
     lbl.setAttribute('x',lx); lbl.setAttribute('y',ly);
-    lbl.setAttribute('text-anchor', flip?'end':'start');
-    lbl.setAttribute('transform','rotate(-55 '+lx+' '+ly+')');
+    lbl.setAttribute('text-anchor', d.endAnchor?'end':'start');
+    lbl.setAttribute('transform','rotate('+d.rot+' '+lx+' '+ly+')');
     lbl.setAttribute('class','eixpoi-label'); lbl.setAttribute('data-cat',p.cat);
     lbl.textContent=p.name;
     if(!visible){ ring.style.display='none'; c.style.display='none'; lbl.style.display='none'; }

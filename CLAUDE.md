@@ -1,6 +1,6 @@
 # Credencial Taxi AMB — app de estudio (PWA)
 
-App web offline para estudiar el manual de la Credencial del Taxi del AMB 2026. 820 preguntas tipo test en catalán y castellano. Se publica en GitHub Pages desde la carpeta `docs/`.
+App web offline para estudiar el manual de la Credencial del Taxi del AMB 2026. 898 preguntas tipo test en catalán y castellano (820 + 78 de itinerarios en `dd_vies_2.js`). Se publica en GitHub Pages desde la carpeta `docs/`.
 
 ## Estructura
 - `src/app.js`: toda la lógica (vistas, repetición espaciada Leitner de 5 cajas, simulacro, idioma CA/ES, guardado).

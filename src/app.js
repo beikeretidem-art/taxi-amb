@@ -1593,13 +1593,18 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
   });
   /* si el nom (en diagonal amunt-dreta) passaria molt a prop d'un altre punt — típic
    * quan dos POI són a la mateixa columna en files consecutives — es capgira: el nom
-   * surt avall-esquerra i s'hi ancora per l'última lletra en lloc de la primera. */
+   * surt avall-esquerra i s'hi ancora per l'última lletra en lloc de la primera.
+   * També es capgira si, anant amunt, el nom sortiria per damunt del marge superior
+   * del mapa (les files 0 i 1 no tenen prou espai a sobre per a noms llargs). */
   placements.forEach(function(pl){
-    pl.flip=placements.some(function(other){
+    var collides=placements.some(function(other){
       if(other===pl) return false;
       var dx=other.x-pl.x, dy=other.y-pl.y;
       return dy<-6 && dy>-46 && Math.abs(dx)<66;
     });
+    var estThrow=pl.p.name.length*5.2*0.82; /* alçada aproximada del nom en diagonal */
+    var wouldClipTop=(pl.y-estThrow)<6;
+    pl.flip=collides||wouldClipTop;
   });
   placements.forEach(function(pl){
     var p=pl.p, x=pl.x, y=pl.y, slot=pl.slot, flip=pl.flip;

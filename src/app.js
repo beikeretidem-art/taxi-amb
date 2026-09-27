@@ -242,7 +242,7 @@ var T = {
   ok:{ca:'D’acord',es:'De acuerdo'},
   cancel:{ca:'Cancel·lar',es:'Cancelar'},
   noQ:{ca:'No hi ha preguntes en aquesta selecció.',es:'No hay preguntas en esta selección.'},
-  langOfQ:{ca:'Pregunta d’idioma: es mostra sempre en la seva llengua.',es:'Pregunta de idioma: se muestra siempre en su lengua.'},
+  langOfQ:{ca:'Pregunta de llengua: les opcions es mantenen sempre en l’idioma avaluat, encara que canviïs CAT/ESP.',es:'Pregunta de idioma: las opciones se mantienen siempre en el idioma evaluado, aunque cambies CAT/ESP.'},
   block:{ca:'Bloc',es:'Bloque'},
   score:{ca:'Nota',es:'Nota'},
   errorsOf:{ca:'%a errors de %b',es:'%a fallos de %b'},
@@ -1167,8 +1167,11 @@ function viewSession(){
   var S2=SESSION; if(!S2){ go('home'); return; }
   var q=S2.list[S2.idx], ord=S2.order[S2.idx], given=S2.ans[S2.idx];
   var isLang = q.f && q.f.indexOf('L')>=0;
-  var qlang = isLang ? (q.m==='cat'?'ca':'es') : S.lang;
-  var qtext = q.q[qlang], opts=q.o[qlang], expl=q.e[qlang];
+  var fixedLang = isLang ? (q.m==='cat'?'ca':'es') : null;
+  /* les preguntes de llengua tradueixen l'enunciat i l'explicació com qualsevol
+   * altra pregunta; només les opcions es queden fixes en l'idioma avaluat,
+   * perquè són el propi contingut lingüístic que es posa a prova. */
+  var qtext = q.q[S.lang], opts=q.o[fixedLang||S.lang], expl=q.e[S.lang];
 
   var html='<div class="wrap fade">';
   /* head */
@@ -1406,12 +1409,12 @@ function viewResult(){
   if(wrongs.length){
     html+='<div class="sec-title"><h2>'+esc(t('review'))+'</h2></div><div class="stack" style="gap:9px">';
     wrongs.forEach(function(w){
-      var isLang=w.q.f&&w.q.f.indexOf('L')>=0, lg=isLang?(w.q.m==='cat'?'ca':'es'):S.lang;
+      var isLang=w.q.f&&w.q.f.indexOf('L')>=0, fixedLang=isLang?(w.q.m==='cat'?'ca':'es'):null;
       html+='<div class="card pad"><div class="tiny muted" style="margin-bottom:6px">'+esc(L(MOD[w.q.m].n))+' · '+esc(L(SUBS[w.q.s]||{ca:w.q.s,es:w.q.s}))+'</div>'+
-        '<div class="small" style="font-weight:650;margin-bottom:9px;white-space:pre-line">'+esc(w.q.q[lg])+'</div>'+
+        '<div class="small" style="font-weight:650;margin-bottom:9px;white-space:pre-line">'+esc(w.q.q[S.lang])+'</div>'+
         '<div class="ansbox ok" style="margin-bottom:9px"><span class="ic" style="color:var(--ok)">'+IC.check+'</span>'+
-          '<div><span class="small" style="font-weight:600">'+esc(w.q.o[lg][w.q.a])+'</span></div></div>'+
-        '<div class="expl small">'+esc(w.q.e[lg])+'</div>'+
+          '<div><span class="small" style="font-weight:600">'+esc(w.q.o[fixedLang||S.lang][w.q.a])+'</span></div></div>'+
+        '<div class="expl small">'+esc(w.q.e[S.lang])+'</div>'+
         (w.q.r?'<div class="ref">'+IC.book+'<span>'+esc(w.q.r)+'</span></div>':'')+
       '</div>';
     });

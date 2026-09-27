@@ -257,6 +257,7 @@ main{padding:18px 0 80px}
 .eixlabel-h{fill:var(--fg2);font-size:10px}
 .eixlabel-h.hi{fill:var(--acc);font-weight:700}
 .eixdiag{stroke:var(--acc2);stroke-width:1.4;stroke-dasharray:6 4;opacity:.5}
+.eixdiag.hi{stroke:var(--acc);stroke-width:3.4;opacity:1}
 .eixpoi{stroke:var(--bg2);stroke-width:1.5;cursor:pointer}
 .eixpoi-ring{fill:none;stroke-width:2;opacity:.5}
 .eixpoi-label{display:none;font-size:8.5px;fill:var(--fg2);pointer-events:none;paint-order:stroke;stroke:var(--bg2);stroke-width:2.5px}
@@ -11020,7 +11021,7 @@ function viewEixMap(){
 
   var body=document.getElementById('eix-body');
   if(EIXVIEW.mode==='lesson'){ eixRenderLesson(body, verticals); return; }
-  if(EIXVIEW.mode==='quiz'){ eixRenderQuiz(body, verticals); return; }
+  if(EIXVIEW.mode==='quiz'){ eixRenderQuiz(body, D, verticals, horizontals, POIS); return; }
   if(EIXVIEW.mode==='itin'){ eixRenderItin(body); return; }
   eixRenderExplore(body, D, verticals, horizontals, POIS);
 }
@@ -11051,21 +11052,27 @@ function eixBuildSvg(verticals, horizontals, D){
     svg.appendChild(line); vLines[v.id]=line;
   });
   var diagSpecs=[0.06,0.16,0.30,0.50,0.68,0.20,0.62,0.80,0.90];
-  var diagGroup=el('g',{'class':'eix-diaggroup'});
+  var diagGroup=el('g',{'class':'eix-diaggroup'}), diagLines={};
   D.diagonals.forEach(function(dg,i){
     var f=diagSpecs[i]!==undefined? diagSpecs[i]:(i/D.diagonals.length);
     var xTop=padL+f*(W-1)*colW;
-    diagGroup.appendChild(el('line',{x1:xTop-36,y1:padT-2,x2:xTop+36,y2:padT+(horizontals.length-1)*rowH+2,class:'eixdiag'}));
+    var line=el('line',{x1:xTop-36,y1:padT-2,x2:xTop+36,y2:padT+(horizontals.length-1)*rowH+2,class:'eixdiag','data-id':dg.id});
+    diagGroup.appendChild(line); diagLines[dg.id]=line;
   });
   svg.appendChild(diagGroup);
-  return {svg:svg, vx:vx, vLines:vLines, hLines:hLines, hLabels:hLabels, diagGroup:diagGroup, gridW:gridW, gridH:gridH, rowH:rowH, padT:padT, horizontals:horizontals};
+  return {svg:svg, vx:vx, vLines:vLines, hLines:hLines, hLabels:hLabels, diagGroup:diagGroup, diagLines:diagLines, gridW:gridW, gridH:gridH, rowH:rowH, padT:padT, horizontals:horizontals};
 }
-function eixRenderExplore(body, D, verticals, horizontals, POIS){
-  var built=eixBuildSvg(verticals, horizontals, D);
-  var svg=built.svg;
-  var maxVName=verticals.reduce(function(m,v){return Math.max(m,(v.name||'').length);},0);
-  var headerH=Math.min(150, Math.max(56, 16+maxVName*6.0)); /* prou alt perquè el nom més llarg no es talli (angle -72°) */
-  svg.style.display='block'; svg.style.width='100%'; svg.style.height='100%'; svg.style.touchAction='none';
+var EIX_POI_DIRS={
+  NE:{rot:-55, endAnchor:false, ox:6,  oy:3,  ux:0.574, uy:-0.819},
+  SW:{rot:-55, endAnchor:true,  ox:-6, oy:-3, ux:-0.574,uy:0.819},
+  SE:{rot:55,  endAnchor:false, ox:6,  oy:3,  ux:0.574, uy:0.819},
+  NW:{rot:55,  endAnchor:true,  ox:-6, oy:-3, ux:-0.574,uy:-0.819}
+};
+/* Construeix el grup SVG amb tots els punts d'interès (punt + nom en diagonal),
+ * triant per a cada un la millor de 4 orientacions perquè els noms no es
+ * solapin entre ells ni surtin del mapa. Es fa servir tant a l'Explorar com
+ * al Test, perquè tots dos mostren els mateixos punts de referència. */
+function eixBuildPoiGroup(built, verticals, horizontals, POIS){
   var poiGroup=document.createElementNS('http://www.w3.org/2000/svg','g');
   var poiSlot={}, placements=[];
   POIS.forEach(function(p){
@@ -11084,12 +11091,6 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
   /* Per a cada punt, tria entre 4 diagonals possibles (amunt-dreta, avall-esquerra,
    * avall-dreta, amunt-esquerra) la que quedi més lluny d'altres punts i que no es
    * surti pel marge superior/inferior del mapa — en lloc d'una regla fixa. */
-  var EIX_POI_DIRS={
-    NE:{rot:-55, endAnchor:false, ox:6,  oy:3,  ux:0.574, uy:-0.819},
-    SW:{rot:-55, endAnchor:true,  ox:-6, oy:-3, ux:-0.574,uy:0.819},
-    SE:{rot:55,  endAnchor:false, ox:6,  oy:3,  ux:0.574, uy:0.819},
-    NW:{rot:55,  endAnchor:true,  ox:-6, oy:-3, ux:-0.574,uy:-0.819}
-  };
   placements.forEach(function(pl){
     var estLen=pl.p.name.length*5.2;
     var best=null, bestScore=Infinity;
@@ -11132,6 +11133,15 @@ function eixRenderExplore(body, D, verticals, horizontals, POIS){
       '<div class="tiny muted">'+esc(p.addr)+'</div><span class="pill" style="margin-top:8px;background:'+(EIX_CAT_COLOR[p.cat]||'#888')+';color:#1b1405;font-weight:700">'+esc(eixCatLabel(p.cat))+'</span>'); });
     poiGroup.appendChild(ring); poiGroup.appendChild(c); poiGroup.appendChild(lbl);
   });
+  return poiGroup;
+}
+function eixRenderExplore(body, D, verticals, horizontals, POIS){
+  var built=eixBuildSvg(verticals, horizontals, D);
+  var svg=built.svg;
+  var maxVName=verticals.reduce(function(m,v){return Math.max(m,(v.name||'').length);},0);
+  var headerH=Math.min(150, Math.max(56, 16+maxVName*6.0)); /* prou alt perquè el nom més llarg no es talli (angle -72°) */
+  svg.style.display='block'; svg.style.width='100%'; svg.style.height='100%'; svg.style.touchAction='none';
+  var poiGroup=eixBuildPoiGroup(built, verticals, horizontals, POIS);
   svg.appendChild(poiGroup);
 
   function clearHi(){
@@ -11325,30 +11335,54 @@ function eixRenderLesson(body, verticals){
   var nx=document.getElementById('eix-next'); if(nx) nx.onclick=function(){ EIXVIEW.lessonIdx++; eixRenderLesson(body,verticals); };
   var rs=document.getElementById('eix-restart'); if(rs) rs.onclick=function(){ EIXVIEW.lessonIdx=0; eixRenderLesson(body,verticals); };
 }
-function eixRenderQuiz(body, verticals){
+function eixRenderQuiz(body, D, verticals, horizontals, POIS){
   body.innerHTML=
-    '<div id="eix-quizmap" class="card" style="overflow:auto;padding:10px;margin-bottom:14px"></div>'+
+    '<div class="card" id="eix-quizstage" style="position:relative;overflow:hidden;height:42vh;padding:0;touch-action:none;margin-bottom:14px">'+
+      '<div style="position:absolute;right:8px;bottom:8px;z-index:2;display:flex;flex-direction:column;gap:6px">'+
+        '<button class="iconbtn" id="eix-zoomin" style="background:var(--bg2)">+</button>'+
+        '<button class="iconbtn" id="eix-zoomout" style="background:var(--bg2)">−</button>'+
+        '<button class="iconbtn" id="eix-zoomfit" style="background:var(--bg2);font-size:.7rem">'+esc(t('eixFit'))+'</button>'+
+      '</div>'+
+    '</div>'+
     '<div class="center" style="font-weight:700;margin-bottom:6px" id="eix-qtext"></div>'+
     '<div class="tiny muted center" style="margin-bottom:12px" id="eix-score"></div>'+
     '<div class="stack" style="gap:8px" id="eix-opts"></div>';
-  var mapEl=document.getElementById('eix-quizmap');
-  var built=eixBuildSvg(verticals, verticals.length? window.EIXAMPLE.horizontals:[], window.EIXAMPLE);
-  var scale=Math.min(1, (Math.min(window.innerWidth,480)-32)/built.gridW);
-  built.svg.setAttribute('width', Math.round(built.gridW*scale));
-  built.svg.setAttribute('height', Math.round(built.gridH*scale));
-  mapEl.appendChild(built.svg);
+  var stage=document.getElementById('eix-quizstage');
+  var built=eixBuildSvg(verticals, horizontals, D);
+  var svg=built.svg;
+  svg.style.display='block'; svg.style.width='100%'; svg.style.height='100%'; svg.style.touchAction='none';
+  /* al Test no s'ha de veure cap nom de carrer (donaria la resposta feta);
+   * els punts d'interès sí es mostren, ja que mai són l'objecte de la pregunta. */
+  Object.values(built.hLabels).forEach(function(l){ l.style.display='none'; });
+  var poiGroup=eixBuildPoiGroup(built, verticals, horizontals, POIS);
+  svg.appendChild(poiGroup);
+  stage.appendChild(svg);
+  eixAttachPanZoom(svg, built.gridW, built.gridH, stage, function(vx0,vw0,ratio){
+    poiGroup.classList.toggle('eix-poi-zoomed', ratio<0.55);
+  });
 
+  var pools=[
+    {items:verticals, lines:built.vLines},
+    {items:horizontals, lines:built.hLines},
+    {items:D.diagonals, lines:built.diagLines}
+  ].filter(function(p){ return p.items && p.items.length; });
+
+  function clearHi(){
+    pools.forEach(function(p){ Object.values(p.lines).forEach(function(l){ l.classList.remove('hi'); }); });
+  }
   function scoreline(){ return t('eixStreak')+': '+EIXVIEW.quizStreak+' · '+t('eixAsked')+': '+EIXVIEW.quizTotal; }
   document.getElementById('eix-score').textContent=scoreline();
 
   function newQuestion(){
     var opts=document.getElementById('eix-opts'); opts.innerHTML='';
-    Object.values(built.vLines).forEach(function(l){ l.classList.remove('hi'); });
-    var target=verticals[Math.floor(Math.random()*verticals.length)];
-    built.vLines[target.id].classList.add('hi');
+    clearHi();
+    var pool=pools[Math.floor(Math.random()*pools.length)];
+    var items=pool.items, lines=pool.lines;
+    var target=items[Math.floor(Math.random()*items.length)];
+    lines[target.id].classList.add('hi');
     document.getElementById('eix-qtext').textContent=t('eixQ');
-    var pool=verticals.filter(function(v){return v.id!==target.id;});
-    var wrongs=[]; while(wrongs.length<3 && pool.length){ var i2=Math.floor(Math.random()*pool.length); wrongs.push(pool.splice(i2,1)[0]); }
+    var rest=items.filter(function(v){return v.id!==target.id;});
+    var wrongs=[]; while(wrongs.length<3 && rest.length){ var i2=Math.floor(Math.random()*rest.length); wrongs.push(rest.splice(i2,1)[0]); }
     var choices=wrongs.concat([target]).sort(function(){return Math.random()-.5;});
     choices.forEach(function(c){
       var b=document.createElement('button'); b.className='btn sm'; b.style.width='100%'; b.textContent=c.name;
